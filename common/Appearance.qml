@@ -53,7 +53,7 @@ Singleton {
         blockLoading: true
         watchChanges: true
         onLoadedChanged: if (loaded)
-                             root.themeData = root.parseThemeData()
+            root.themeData = root.parseThemeData()
         onFileChanged: {
             reload();
             root.themeData = root.parseThemeData();

@@ -17,7 +17,7 @@ It is controlled over Quickshell IPC and is designed for keyboard-first workflow
 
 ![Overview Screenshot](assets/image.png)
 
-https://github.com/user-attachments/assets/9c3d2488-1c24-4cdd-84cd-87c4397d02a8
+<https://github.com/user-attachments/assets/9c3d2488-1c24-4cdd-84cd-87c4397d02a8>
 
 ## Support Policy
 

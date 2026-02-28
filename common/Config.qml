@@ -45,7 +45,7 @@ Singleton {
         blockLoading: true
         watchChanges: true
         onLoadedChanged: if (loaded)
-                             root.settingsData = root.parseSettingsData()
+            root.settingsData = root.parseSettingsData()
         onFileChanged: {
             reload();
             root.settingsData = root.parseSettingsData();
