@@ -11,7 +11,7 @@ It is controlled over Quickshell IPC and is designed for keyboard-first workflow
 - Open: `overzicht ipc call overview open`
 - Close: `overzicht ipc call overview close`
 
-`WlrLayershell.namespace` is `quickshell:overzicht`.
+`WlrLayershell.namespace` is `overzicht`.
 
 ## Preview
 

@@ -22,7 +22,7 @@ Scope {
             screen: modelData
             visible: GlobalStates.overviewOpen
 
-            WlrLayershell.namespace: "quickshell:overzicht"
+            WlrLayershell.namespace: "overzicht"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
             color: "transparent"
