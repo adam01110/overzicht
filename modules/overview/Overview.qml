@@ -22,7 +22,7 @@ Scope {
             screen: modelData
             visible: GlobalStates.overviewOpen
 
-            WlrLayershell.namespace: "quickshell:overview"
+            WlrLayershell.namespace: "quickshell:overzicht"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
             color: "transparent"
@@ -34,8 +34,8 @@ Scope {
             anchors {
                 top: true
                 bottom: true
-                left: !(Config?.options.overview.enable ?? true) 
-                right: !(Config?.options.overview.enable ?? true) 
+                left: !(Config?.options.overview.enable ?? true)
+                right: !(Config?.options.overview.enable ?? true)
             }
 
             HyprlandFocusGrab {
@@ -92,42 +92,31 @@ Scope {
                     const currentGroup = Math.floor((currentId - 1) / workspacesPerGroup);
                     const minWorkspaceId = currentGroup * workspacesPerGroup + 1;
                     const maxWorkspaceId = minWorkspaceId + workspacesPerGroup - 1;
-                    
-                    // When hideEmptyRows is enabled, constrain navigation to current row
-                    const currentRow = Math.floor((currentId - minWorkspaceId) / Config.options.overview.columns);
-                    const rowMinId = minWorkspaceId + currentRow * Config.options.overview.columns;
-                    const rowMaxId = rowMinId + Config.options.overview.columns - 1;
 
                     let targetId = null;
 
                     // Arrow keys and vim-style hjkl
                     if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
                         targetId = currentId - 1;
-                        // Wrap within visible workspaces
-                        if (Config.options.overview.hideEmptyRows) {
-                            if (targetId < rowMinId) targetId = rowMaxId;
-                        } else {
-                            if (targetId < minWorkspaceId) targetId = maxWorkspaceId;
-                        }
+                        if (targetId < minWorkspaceId)
+                            targetId = maxWorkspaceId;
                     } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
                         targetId = currentId + 1;
-                        // Wrap within visible workspaces
-                        if (Config.options.overview.hideEmptyRows) {
-                            if (targetId > rowMaxId) targetId = rowMinId;
-                        } else {
-                            if (targetId > maxWorkspaceId) targetId = minWorkspaceId;
-                        }
+                        if (targetId > maxWorkspaceId)
+                            targetId = minWorkspaceId;
                     } else if (event.key === Qt.Key_Up || event.key === Qt.Key_K) {
                         targetId = currentId - Config.options.overview.columns;
-                        if (targetId < minWorkspaceId) targetId += workspacesPerGroup;
+                        if (targetId < minWorkspaceId)
+                            targetId += workspacesPerGroup;
                     } else if (event.key === Qt.Key_Down || event.key === Qt.Key_J) {
                         targetId = currentId + Config.options.overview.columns;
-                        if (targetId > maxWorkspaceId) targetId -= workspacesPerGroup;
-                    }
+                        if (targetId > maxWorkspaceId)
+                            targetId -= workspacesPerGroup;
+                    } else
 
                     // Number keys: jump to workspace within the current group
                     // 1-9 map to positions 1-9, 0 maps to position 10
-                    else if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
+                    if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
                         const position = event.key - Qt.Key_0; // 1-9
                         if (position <= workspacesPerGroup) {
                             targetId = minWorkspaceId + position - 1;
@@ -149,11 +138,7 @@ Scope {
             ColumnLayout {
                 id: columnLayout
                 visible: GlobalStates.overviewOpen
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.top
-                    topMargin: 100
-                }
+                anchors.centerIn: parent
 
                 Loader {
                     id: overviewLoader
@@ -166,7 +151,7 @@ Scope {
             }
         }
     }
-    
+
     IpcHandler {
         target: "overview"
 

@@ -20,7 +20,7 @@ Item { // Window
     property real xOffset: 0
     property real yOffset: 0
     property int widgetMonitorId: 0
-    
+
     property var targetWindowWidth: (windowData?.size[0] ?? 100) * scale
     property var targetWindowHeight: (windowData?.size[1] ?? 100) * scale
     property bool hovered: false
@@ -34,7 +34,7 @@ Item { // Window
     property bool compactMode: Appearance.font.pixelSize.smaller * 4 > targetWindowHeight || Appearance.font.pixelSize.smaller * 4 > targetWindowWidth
 
     property bool indicateXWayland: windowData?.xwayland ?? false
-    
+
     x: initX
     y: initY
     width: Math.min((windowData?.size[0] ?? 100) * root.scale, availableWorkspaceWidth)
@@ -64,12 +64,10 @@ Item { // Window
 
         Rectangle {
             anchors.fill: parent
-            radius: Appearance.rounding.windowRounding * root.scale
-            color: pressed ? ColorUtils.transparentize(Appearance.colors.colLayer2Active, 0.5) : 
-                hovered ? ColorUtils.transparentize(Appearance.colors.colLayer2Hover, 0.7) : 
-                ColorUtils.transparentize(Appearance.colors.colLayer2)
-            border.color : ColorUtils.transparentize(Appearance.m3colors.m3outline, 0.7)
-            border.width : 1
+            radius: Appearance.rounding.windowRounding
+            color: pressed ? ColorUtils.transparentize(Appearance.colors.colLayer2Active, 0.5) : hovered ? ColorUtils.transparentize(Appearance.colors.colLayer2Hover, 0.7) : ColorUtils.transparentize(Appearance.colors.colLayer2)
+            border.color: ColorUtils.transparentize(Appearance.m3colors.m3outline, 0.7)
+            border.width: 1
         }
 
         ColumnLayout {

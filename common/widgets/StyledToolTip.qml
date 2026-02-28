@@ -12,7 +12,7 @@ ToolTip {
     background: null
 
     visible: internalVisibleCondition
-    
+
     contentItem: StyledToolTipContent {
         id: contentItem
         text: root.text

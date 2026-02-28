@@ -2,15 +2,44 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtCore
 import Quickshell
+import Quickshell.Io
 import "functions"
-import "." as Common
 
 Singleton {
     id: root
-    property QtObject m3colors: Common.Config.options.appearance.useMatugenColors && matugenLoader.item 
-                                 ? matugenLoader.item 
-                                 : defaultColors
+    function themeValue(path, fallback = undefined) {
+        let current = root.themeData;
+
+        for (let i = 0; i < path.length; i++) {
+            if (current === null || current === undefined)
+                return fallback;
+
+            current = current[path[i]];
+        }
+
+        return current === undefined || current === null ? fallback : current;
+    }
+
+    function parseThemeData() {
+        try {
+            const content = themeFile.text();
+
+            if (!content || content.trim().length === 0)
+                return ({});
+
+            return JSON.parse(content);
+        } catch (error) {
+            console.warn(`Failed to parse theme json: ${error}`);
+            return ({});
+        }
+    }
+
+    property string configDirectory: StandardPaths.standardLocations(StandardPaths.ConfigLocation)[0]
+    property var themeData: ({})
+
+    property QtObject m3colors
     property QtObject animation
     property QtObject animationCurves
     property QtObject colors
@@ -18,37 +47,45 @@ Singleton {
     property QtObject font
     property QtObject sizes
 
-    Loader {
-        id: matugenLoader
-        active: Common.Config.options.appearance.useMatugenColors
-        source: "Appearance.colors.qml"
+    FileView {
+        id: themeFile
+        path: `${root.configDirectory}/overzicht/colors.json`
+        blockLoading: true
+        watchChanges: true
+        onLoadedChanged: if (loaded)
+                             root.themeData = root.parseThemeData()
+        onFileChanged: {
+            reload();
+            root.themeData = root.parseThemeData();
+        }
     }
 
-    property QtObject defaultColors: QtObject {
-        property bool darkmode: true
-        property color m3primary: "#E5B6F2"
-        property color m3onPrimary: "#452152"
-        property color m3primaryContainer: "#5D386A"
-        property color m3onPrimaryContainer: "#F9D8FF"
-        property color m3secondary: "#D5C0D7"
-        property color m3onSecondary: "#392C3D"
-        property color m3secondaryContainer: "#534457"
-        property color m3onSecondaryContainer: "#F2DCF3"
-        property color m3background: "#161217"
-        property color m3onBackground: "#EAE0E7"
-        property color m3surface: "#161217"
-        property color m3surfaceContainerLow: "#1F1A1F"
-        property color m3surfaceContainer: "#231E23"
-        property color m3surfaceContainerHigh: "#2D282E"
-        property color m3surfaceContainerHighest: "#383339"
-        property color m3onSurface: "#EAE0E7"
-        property color m3surfaceVariant: "#4C444D"
-        property color m3onSurfaceVariant: "#CFC3CD"
-        property color m3inverseSurface: "#EAE0E7"
-        property color m3inverseOnSurface: "#342F34"
-        property color m3outline: "#988E97"
-        property color m3outlineVariant: "#4C444D"
-        property color m3shadow: "#000000"
+    Component.onCompleted: themeData = parseThemeData()
+
+    m3colors: QtObject {
+        property color m3primary: root.themeValue(["m3primary"], "#E5B6F2")
+        property color m3onPrimary: root.themeValue(["m3onPrimary"], "#452152")
+        property color m3primaryContainer: root.themeValue(["m3primaryContainer"], "#5D386A")
+        property color m3onPrimaryContainer: root.themeValue(["m3onPrimaryContainer"], "#F9D8FF")
+        property color m3onSecondary: root.themeValue(["m3onSecondary"], "#392C3D")
+        property color m3secondaryContainer: root.themeValue(["m3secondaryContainer"], "#534457")
+        property color m3onSecondaryContainer: root.themeValue(["m3onSecondaryContainer"], "#F2DCF3")
+        property color m3onBackground: root.themeValue(["m3onBackground"], "#EAE0E7")
+        property color m3surface: root.themeValue(["m3surface"], "#161217")
+        property color m3surfaceContainerHigh: root.themeValue(["m3surfaceContainerHigh"], "#2D282E")
+        property color m3surfaceContainerHighest: root.themeValue(["m3surfaceContainerHighest"], "#383339")
+        property color m3surfaceVariant: root.themeValue(["m3surfaceVariant"], "#4C444D")
+        property color m3background: root.themeValue(["m3background"], "#161217")
+        property color m3secondary: root.themeValue(["m3secondary"], "#D5C0D7")
+        property color m3surfaceContainerLow: root.themeValue(["m3surfaceContainerLow"], "#1F1A1F")
+        property color m3surfaceContainer: root.themeValue(["m3surfaceContainer"], "#231E23")
+        property color m3onSurface: root.themeValue(["m3onSurface"], "#EAE0E7")
+        property color m3onSurfaceVariant: root.themeValue(["m3onSurfaceVariant"], "#CFC3CD")
+        property color m3inverseSurface: root.themeValue(["m3inverseSurface"], "#EAE0E7")
+        property color m3inverseOnSurface: root.themeValue(["m3inverseOnSurface"], "#342F34")
+        property color m3outline: root.themeValue(["m3outline"], "#988E97")
+        property color m3outlineVariant: root.themeValue(["m3outlineVariant"], "#4C444D")
+        property color m3shadow: root.themeValue(["m3shadow"], "#000000")
     }
 
     colors: QtObject {
@@ -77,28 +114,28 @@ Singleton {
     }
 
     rounding: QtObject {
-        property int unsharpen: 2
-        property int verysmall: 8
-        property int small: 12
-        property int normal: 17
-        property int large: 23
-        property int full: 9999
-        property int screenRounding: large
-        property int windowRounding: 18
+        property int unsharpen: 0
+        property int verysmall: 0
+        property int small: 0
+        property int normal: 0
+        property int large: 0
+        property int full: 0
+        property int screenRounding: 0
+        property int windowRounding: 0
     }
 
     font: QtObject {
         property QtObject family: QtObject {
-            property string main: "sans-serif"
-            property string title: "sans-serif"
-            property string expressive: "sans-serif"
+            property string main: root.themeValue(["font", "family", "main"], "sans-serif")
+            property string title: root.themeValue(["font", "family", "title"], "sans-serif")
+            property string expressive: root.themeValue(["font", "family", "expressive"], "sans-serif")
         }
         property QtObject pixelSize: QtObject {
-            property int smaller: 12
-            property int small: 15
-            property int normal: 16
-            property int larger: 19
-            property int huge: 22
+            property int smaller: root.themeValue(["font", "pixelSize", "smaller"], 12)
+            property int small: root.themeValue(["font", "pixelSize", "small"], 15)
+            property int normal: root.themeValue(["font", "pixelSize", "normal"], 16)
+            property int larger: root.themeValue(["font", "pixelSize", "larger"], 19)
+            property int huge: root.themeValue(["font", "pixelSize", "huge"], 22)
         }
     }
 
