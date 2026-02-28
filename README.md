@@ -26,6 +26,14 @@ Nix is the only supported installation path.
 - No AUR package.
 - No manual non-Nix installer.
 
+## Removed Features
+
+Compared to the quickshell-overview project, the following functionality was removed:
+
+- Matugen-driven dynamic color loading (`useMatugenColors` and `Appearance.colors.qml` template flow).
+- Smart row hiding (`hideEmptyRows`) for empty workspace rows.
+- Row-constrained left/right keyboard navigation that depended on `hideEmptyRows`.
+
 ## Flake Outputs
 
 - `packages.<system>.overzicht`
