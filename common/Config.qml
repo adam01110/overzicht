@@ -60,6 +60,7 @@ Singleton {
             property int columns: root.optionValue(["overview", "columns"], 4)
             property real scale: root.optionValue(["overview", "scale"], 0.12)
             property bool enable: root.optionValue(["overview", "enable"], true)
+            property bool hideEmptyRows: root.optionValue(["overview", "hideEmptyRows"], false)
         }
 
         property QtObject hacks: QtObject {

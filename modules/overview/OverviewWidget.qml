@@ -36,6 +36,44 @@ Item {
 
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
+    property bool hideEmptyRows: Config.options.overview.hideEmptyRows
+
+    property var rowsWithContent: {
+        if (!root.hideEmptyRows)
+            return null;
+
+        let rows = new Set();
+        const firstWorkspace = root.workspaceGroup * root.workspacesShown + 1;
+        const lastWorkspace = (root.workspaceGroup + 1) * root.workspacesShown;
+
+        const currentWorkspace = monitor.activeWorkspace?.id ?? 1;
+        if (currentWorkspace >= firstWorkspace && currentWorkspace <= lastWorkspace)
+            rows.add(Math.floor((currentWorkspace - firstWorkspace) / Config.options.overview.columns));
+
+        for (let addr in windowByAddress) {
+            const win = windowByAddress[addr];
+            const wsId = win?.workspace?.id;
+            if (wsId >= firstWorkspace && wsId <= lastWorkspace)
+                rows.add(Math.floor((wsId - firstWorkspace) / Config.options.overview.columns));
+        }
+
+        return rows;
+    }
+
+    property var visibleRows: {
+        if (!root.hideEmptyRows || !root.rowsWithContent)
+            return null;
+
+        return Array.from(root.rowsWithContent).sort((a, b) => a - b);
+    }
+
+    function mappedRowIndex(rowIndex) {
+        if (!root.hideEmptyRows || !root.visibleRows)
+            return rowIndex;
+
+        const mappedIndex = root.visibleRows.indexOf(rowIndex);
+        return mappedIndex === -1 ? rowIndex : mappedIndex;
+    }
 
     implicitWidth: overviewBackground.implicitWidth + Appearance.sizes.elevationMargin * 2
     implicitHeight: overviewBackground.implicitHeight + Appearance.sizes.elevationMargin * 2
@@ -71,6 +109,8 @@ Item {
                     id: row
                     property int rowIndex: index
                     spacing: workspaceSpacing
+                    visible: !root.hideEmptyRows || (root.rowsWithContent && root.rowsWithContent.has(rowIndex))
+                    height: visible ? implicitHeight : 0
 
                     Repeater {
                         // Workspace repeater
@@ -200,8 +240,9 @@ Item {
 
                     property int workspaceColIndex: (windowData?.workspace.id - 1) % Config.options.overview.columns
                     property int workspaceRowIndex: Math.floor((windowData?.workspace.id - 1) % root.workspacesShown / Config.options.overview.columns)
+                    property int workspaceVisibleRowIndex: root.mappedRowIndex(workspaceRowIndex)
                     xOffset: (root.workspaceImplicitWidth + workspaceSpacing) * workspaceColIndex
-                    yOffset: (root.workspaceImplicitHeight + workspaceSpacing) * workspaceRowIndex
+                    yOffset: (root.workspaceImplicitHeight + workspaceSpacing) * workspaceVisibleRowIndex
 
                     Timer {
                         id: updateWindowPosition
@@ -275,7 +316,7 @@ Item {
                 property int activeWorkspaceRowIndex: Math.floor((activeWorkspaceInGroup - 1) / Config.options.overview.columns)
                 property int activeWorkspaceColIndex: (activeWorkspaceInGroup - 1) % Config.options.overview.columns
                 x: (root.workspaceImplicitWidth + workspaceSpacing) * activeWorkspaceColIndex
-                y: (root.workspaceImplicitHeight + workspaceSpacing) * activeWorkspaceRowIndex
+                y: (root.workspaceImplicitHeight + workspaceSpacing) * root.mappedRowIndex(activeWorkspaceRowIndex)
                 z: root.windowZ
                 width: root.workspaceImplicitWidth
                 height: root.workspaceImplicitHeight

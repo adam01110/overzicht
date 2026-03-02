@@ -45,6 +45,7 @@ in {
           columns = 4;
           scale = 0.12;
           enable = true;
+          hideEmptyRows = false;
         };
 
         hacks.arbitraryRaceConditionDelay = 150;
