@@ -39,11 +39,13 @@ in {
 
     settings = mkOption {
       type = types.oneOf [jsonFormat.type types.str types.path];
+      default = {};
       description = "Settings written to `~/.config/overzicht/settings.json`.";
     };
 
     colors = mkOption {
       type = types.oneOf [jsonFormat.type types.str types.path];
+      default = {};
       description = "Colors written to `~/.config/overzicht/colors.json`.";
     };
   };
