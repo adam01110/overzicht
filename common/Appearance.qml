@@ -114,14 +114,14 @@ Singleton {
     }
 
     rounding: QtObject {
-        property int unsharpen: 0
-        property int verysmall: 0
-        property int small: 0
-        property int normal: 0
-        property int large: 0
-        property int full: 0
-        property int screenRounding: 0
-        property int windowRounding: 0
+        property int unsharpen: Config.options.appearance.rounding.unsharpen
+        property int verysmall: Config.options.appearance.rounding.verysmall
+        property int small: Config.options.appearance.rounding.small
+        property int normal: Config.options.appearance.rounding.normal
+        property int large: Config.options.appearance.rounding.large
+        property int full: Config.options.appearance.rounding.full
+        property int screenRounding: Config.options.appearance.rounding.screenRounding
+        property int windowRounding: Config.options.appearance.rounding.windowRounding
     }
 
     font: QtObject {
@@ -143,8 +143,8 @@ Singleton {
         readonly property list<real> expressiveDefaultSpatial: [0.38, 1.21, 0.22, 1.00, 1, 1]
         readonly property list<real> expressiveEffects: [0.34, 0.80, 0.34, 1.00, 1, 1]
         readonly property list<real> emphasizedDecel: [0.05, 0.7, 0.1, 1, 1, 1]
-        readonly property real expressiveDefaultSpatialDuration: 500
-        readonly property real expressiveEffectsDuration: 200
+        readonly property real expressiveDefaultSpatialDuration: Config.options.appearance.animation.duration.elementMove
+        readonly property real expressiveEffectsDuration: Config.options.appearance.animation.duration.elementMoveFast
     }
 
     animation: QtObject {
@@ -162,7 +162,7 @@ Singleton {
         }
 
         property QtObject elementMoveEnter: QtObject {
-            property int duration: 400
+            property int duration: Config.options.appearance.animation.duration.elementMoveEnter
             property int type: Easing.BezierSpline
             property list<real> bezierCurve: animationCurves.emphasizedDecel
             property Component numberAnimation: Component {
@@ -189,6 +189,6 @@ Singleton {
     }
 
     sizes: QtObject {
-        property real elevationMargin: 10
+        property real elevationMargin: Config.options.appearance.sizes.elevationMargin
     }
 }

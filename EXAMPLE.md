@@ -8,12 +8,43 @@ Path: `~/.config/overzicht/settings.json`
 
 ```json
 {
+  "appearance": {
+    "rounding": {
+      "unsharpen": 0,
+      "verysmall": 0,
+      "small": 0,
+      "normal": 0,
+      "large": 0,
+      "full": 0,
+      "screenRounding": 0,
+      "windowRounding": 0
+    },
+    "animation": {
+      "duration": {
+        "elementMove": 500,
+        "elementMoveEnter": 400,
+        "elementMoveFast": 200
+      }
+    },
+    "sizes": {
+      "elevationMargin": 10
+    }
+  },
   "overview": {
     "rows": 2,
     "columns": 4,
     "scale": 0.12,
     "enable": true,
-    "hideEmptyRows": false
+    "hideEmptyRows": false,
+    "workspaceSpacing": 5,
+    "backgroundPadding": 10,
+    "workspaceNumberBaseSize": 250
+  },
+  "windowPreview": {
+    "iconToWindowRatio": 0.25,
+    "iconToWindowRatioCompact": 0.45,
+    "xwaylandIndicatorToIconRatio": 0.35,
+    "inactiveMonitorOpacity": 0.4
   },
   "hacks": {
     "arbitraryRaceConditionDelay": 150
