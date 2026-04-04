@@ -32,6 +32,8 @@ Compared to the quickshell-overview project, the following functionality was rem
 
 - Matugen-driven dynamic color loading
   (`useMatugenColors` and `Appearance.colors.qml` template flow).
+- Color source selection and Caelestia live sync
+  (`appearance.colorSource`, Caelestia integration, and related live theme sync).
 
 ## Flake Outputs
 
