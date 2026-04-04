@@ -19,6 +19,20 @@ Path: `~/.config/overzicht/settings.json`
       "screenRounding": 0,
       "windowRounding": 0
     },
+    "font": {
+      "family": {
+        "main": "sans-serif",
+        "title": "sans-serif",
+        "expressive": "sans-serif"
+      },
+      "pixelSize": {
+        "smaller": 12,
+        "small": 15,
+        "normal": 16,
+        "larger": 19,
+        "huge": 22
+      }
+    },
     "animation": {
       "duration": {
         "elementMove": 500,
@@ -39,6 +53,9 @@ Path: `~/.config/overzicht/settings.json`
     "workspaceSpacing": 5,
     "backgroundPadding": 10,
     "workspaceNumberBaseSize": 250
+  },
+  "position": {
+    "topMargin": 100
   },
   "windowPreview": {
     "iconToWindowRatio": 0.25,

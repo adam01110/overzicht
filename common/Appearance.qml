@@ -126,16 +126,16 @@ Singleton {
 
     font: QtObject {
         property QtObject family: QtObject {
-            property string main: root.themeValue(["font", "family", "main"], "sans-serif")
-            property string title: root.themeValue(["font", "family", "title"], "sans-serif")
-            property string expressive: root.themeValue(["font", "family", "expressive"], "sans-serif")
+            property string main: Config.optionValue(["appearance", "font", "family", "main"], root.themeValue(["font", "family", "main"], "sans-serif"))
+            property string title: Config.optionValue(["appearance", "font", "family", "title"], root.themeValue(["font", "family", "title"], "sans-serif"))
+            property string expressive: Config.optionValue(["appearance", "font", "family", "expressive"], root.themeValue(["font", "family", "expressive"], "sans-serif"))
         }
         property QtObject pixelSize: QtObject {
-            property int smaller: root.themeValue(["font", "pixelSize", "smaller"], 12)
-            property int small: root.themeValue(["font", "pixelSize", "small"], 15)
-            property int normal: root.themeValue(["font", "pixelSize", "normal"], 16)
-            property int larger: root.themeValue(["font", "pixelSize", "larger"], 19)
-            property int huge: root.themeValue(["font", "pixelSize", "huge"], 22)
+            property int smaller: Config.optionValue(["appearance", "font", "pixelSize", "smaller"], root.themeValue(["font", "pixelSize", "smaller"], 12))
+            property int small: Config.optionValue(["appearance", "font", "pixelSize", "small"], root.themeValue(["font", "pixelSize", "small"], 15))
+            property int normal: Config.optionValue(["appearance", "font", "pixelSize", "normal"], root.themeValue(["font", "pixelSize", "normal"], 16))
+            property int larger: Config.optionValue(["appearance", "font", "pixelSize", "larger"], root.themeValue(["font", "pixelSize", "larger"], 19))
+            property int huge: Config.optionValue(["appearance", "font", "pixelSize", "huge"], root.themeValue(["font", "pixelSize", "huge"], 22))
         }
     }
 

@@ -67,6 +67,22 @@ Singleton {
                 property int windowRounding: root.optionValue(["appearance", "rounding", "windowRounding"], 0)
             }
 
+            property QtObject font: QtObject {
+                property QtObject family: QtObject {
+                    property string main: root.optionValue(["appearance", "font", "family", "main"], "sans-serif")
+                    property string title: root.optionValue(["appearance", "font", "family", "title"], "sans-serif")
+                    property string expressive: root.optionValue(["appearance", "font", "family", "expressive"], "sans-serif")
+                }
+
+                property QtObject pixelSize: QtObject {
+                    property int smaller: root.optionValue(["appearance", "font", "pixelSize", "smaller"], 12)
+                    property int small: root.optionValue(["appearance", "font", "pixelSize", "small"], 15)
+                    property int normal: root.optionValue(["appearance", "font", "pixelSize", "normal"], 16)
+                    property int larger: root.optionValue(["appearance", "font", "pixelSize", "larger"], 19)
+                    property int huge: root.optionValue(["appearance", "font", "pixelSize", "huge"], 22)
+                }
+            }
+
             property QtObject animation: QtObject {
                 property QtObject duration: QtObject {
                     property int elementMove: root.optionValue(["appearance", "animation", "duration", "elementMove"], 500)
@@ -89,6 +105,10 @@ Singleton {
             property real workspaceSpacing: root.optionValue(["overview", "workspaceSpacing"], 5)
             property real backgroundPadding: root.optionValue(["overview", "backgroundPadding"], 10)
             property real workspaceNumberBaseSize: root.optionValue(["overview", "workspaceNumberBaseSize"], 250)
+        }
+
+        property QtObject position: QtObject {
+            property real topMargin: root.optionValue(["position", "topMargin"], 100)
         }
 
         property QtObject windowPreview: QtObject {
