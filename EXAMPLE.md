@@ -58,6 +58,18 @@ Path: `~/.config/overzicht/settings.json`
     "previewMode": "live",
     "includeInactiveMonitorPreviews": true,
     "previewRecaptureDelayMs": 60,
+    "effects": {
+      "enableBackdrop": false,
+      "backdropOpacity": 0.28,
+      "panelOpacity": 0.92,
+      "workspaceOpacity": 0.86,
+      "windowOverlayOpacity": 0.22,
+      "enableBlur": false,
+      "glassMode": false,
+      "glassTintStrength": 0.35,
+      "glassBorderOpacity": 0.72,
+      "glassShineOpacity": 0.14
+    },
     "workspaceSpacing": 5,
     "backgroundPadding": 10,
     "workspaceNumberBaseSize": 250

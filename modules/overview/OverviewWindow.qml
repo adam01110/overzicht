@@ -33,6 +33,10 @@ Item { // Window
     property bool previewsEnabled: Config.options.overview.previewsEnabled
     property bool includeInactiveMonitorPreviews: Config.options.overview.includeInactiveMonitorPreviews
     property int previewRecaptureDelayMs: Config.options.overview.previewRecaptureDelayMs
+    property real windowOverlayOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.windowOverlayOpacity))
+    property bool glassMode: Config.options.overview.effects.glassMode
+    property real glassShineOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.glassShineOpacity))
+    property real effectiveWindowOverlayOpacity: glassMode ? Math.min(windowOverlayOpacity, 0.10) : windowOverlayOpacity
     property string previewModeRaw: Config.options.overview.previewMode
     property string previewMode: {
         const mode = `${previewModeRaw ?? "live"}`.trim().toLowerCase();
@@ -94,10 +98,32 @@ Item { // Window
 
         Rectangle {
             anchors.fill: parent
-            radius: Appearance.rounding.windowRounding
-            color: pressed ? ColorUtils.transparentize(Appearance.colors.colLayer2Active, 0.5) : hovered ? ColorUtils.transparentize(Appearance.colors.colLayer2Hover, 0.7) : ColorUtils.transparentize(Appearance.colors.colLayer2)
-            border.color: ColorUtils.transparentize(Appearance.m3colors.m3outline, 0.7)
+            radius: Appearance.rounding.windowRounding * root.scale
+            color: pressed ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Active, Math.min(1, root.effectiveWindowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Hover, Math.min(1, root.effectiveWindowOverlayOpacity + 0.20)) : ColorUtils.applyAlpha(root.glassMode ? ColorUtils.mix(Appearance.colors.colLayer2, Appearance.colors.colLayer0, 0.38) : Appearance.colors.colLayer2, root.effectiveWindowOverlayOpacity)
+            border.color: root.glassMode ? ColorUtils.applyAlpha(Appearance.m3colors.m3outline, 0.62) : ColorUtils.transparentize(Appearance.m3colors.m3outline, 0.7)
             border.width: 1
+
+            Rectangle {
+                visible: root.glassMode
+                anchors.fill: parent
+                radius: parent.radius
+                color: "transparent"
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: ColorUtils.applyAlpha("#FFFFFF", root.glassShineOpacity * 0.24) }
+                    GradientStop { position: 0.5; color: ColorUtils.applyAlpha("#FFFFFF", 0.0) }
+                    GradientStop { position: 1.0; color: ColorUtils.applyAlpha("#000000", root.glassShineOpacity * 0.14) }
+                }
+            }
+
+            Rectangle {
+                visible: root.glassMode
+                anchors.fill: parent
+                anchors.margins: 1
+                radius: Math.max(parent.radius - 1, 0)
+                color: "transparent"
+                border.width: 1
+                border.color: ColorUtils.applyAlpha("#FFFFFF", root.glassShineOpacity * 0.32)
+            }
         }
 
         ColumnLayout {
