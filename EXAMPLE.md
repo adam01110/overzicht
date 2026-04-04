@@ -49,6 +49,9 @@ Path: `~/.config/overzicht/settings.json`
     "includeInactiveMonitorPreviews": true,
     "previewRecaptureDelayMs": 60,
     "emptyWorkspaceWallpaper": "",
+    "showSpecialWorkspaces": true,
+    "specialWorkspaces": [],
+    "specialWorkspaceColumns": 4,
     "effects": {
       "enableBackdrop": false,
       "backdropOpacity": 0.28,

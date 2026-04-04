@@ -81,6 +81,9 @@ Additional optional settings:
 - `overview.includeInactiveMonitorPreviews`
 - `overview.previewRecaptureDelayMs`
 - `overview.emptyWorkspaceWallpaper`
+- `overview.showSpecialWorkspaces`
+- `overview.specialWorkspaces`
+- `overview.specialWorkspaceColumns`
 - `overview.effects.enableBackdrop`
 - `overview.effects.backdropOpacity`
 - `overview.effects.panelOpacity`
@@ -89,13 +92,17 @@ Additional optional settings:
 - `overview.effects.windowOverlayOpacity`
 - `hacks.hyprlandEventDebounceMs`
 
+Special workspace notes:
+
+- `showSpecialWorkspaces` adds a strip below the normal workspace grid.
+- `specialWorkspaces` can predeclare names that should always appear in that strip.
+- `specialWorkspaceColumns` controls how many special-workspace tiles are shown per row.
+- The strip shows active special workspaces plus any preconfigured names.
+- Dragging onto the `+` tile can create a new special workspace automatically.
+
 Visual effects notes:
 
 - `enableBackdrop` adds a dimmed full-screen backdrop behind the overview.
-Visual effects notes:
-
-- `enableBackdrop` adds a dimmed full-screen backdrop behind the overview.
-- `emptyWorkspaceWallpaperOverlayOpacity` controls the tint applied over wallpaper-backed tiles.
 - `emptyWorkspaceWallpaper` sets a background image for normal workspace tiles.
 - `emptyWorkspaceWallpaperOverlayOpacity` controls the tint applied over wallpaper-backed tiles.
 

@@ -12,18 +12,24 @@ Item { // Window
     property var toplevel
     property var windowData
     property var monitorData
+    property var widgetMonitorData: monitorData
     property var scale
     property var availableWorkspaceWidth
     property var availableWorkspaceHeight
+    property int recaptureToken: 0
     property bool restrictToWorkspace: true
-    property real initX: Math.max(((windowData?.at[0] ?? 0) - (monitorData?.x ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * root.scale, 0) + xOffset
-    property real initY: Math.max(((windowData?.at[1] ?? 0) - (monitorData?.y ?? 0) - (monitorData?.reserved?.[1] ?? 0)) * root.scale, 0) + yOffset
+    property real positionBaseX: (monitorData?.x ?? 0) + (monitorData?.reserved?.[0] ?? 0)
+    property real positionBaseY: (monitorData?.y ?? 0) + (monitorData?.reserved?.[1] ?? 0)
+    property real geometryScaleX: 1
+    property real geometryScaleY: 1
+    property real initX: Math.max(((windowData?.at[0] ?? 0) - positionBaseX) * root.scale * geometryScaleX, 0) + xOffset
+    property real initY: Math.max(((windowData?.at[1] ?? 0) - positionBaseY) * root.scale * geometryScaleY, 0) + yOffset
     property real xOffset: 0
     property real yOffset: 0
     property int widgetMonitorId: 0
 
-    property var targetWindowWidth: (windowData?.size[0] ?? 100) * scale
-    property var targetWindowHeight: (windowData?.size[1] ?? 100) * scale
+    property var targetWindowWidth: (windowData?.size[0] ?? 100) * scale * geometryScaleX
+    property var targetWindowHeight: (windowData?.size[1] ?? 100) * scale * geometryScaleY
     property bool hovered: false
     property bool pressed: false
 
@@ -60,6 +66,9 @@ Item { // Window
     property bool indicateXWayland: windowData?.xwayland ?? false
     property bool previewCaptureEnabled: true
     property bool initialized: false
+    property bool dragInProgress: false
+    property bool suspendPositionAnimation: false
+    property bool animateSize: true
 
     x: initX
     y: initY
@@ -71,19 +80,19 @@ Item { // Window
     Component.onCompleted: Qt.callLater(() => root.initialized = true)
 
     Behavior on x {
-        enabled: root.initialized
+        enabled: root.initialized && !root.dragInProgress && !root.suspendPositionAnimation
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
     Behavior on y {
-        enabled: root.initialized
+        enabled: root.initialized && !root.dragInProgress && !root.suspendPositionAnimation
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
     Behavior on width {
-        enabled: root.initialized
+        enabled: root.initialized && root.animateSize && !root.dragInProgress && !root.suspendPositionAnimation
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
     Behavior on height {
-        enabled: root.initialized
+        enabled: root.initialized && root.animateSize && !root.dragInProgress && !root.suspendPositionAnimation
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
 
@@ -110,20 +119,14 @@ Item { // Window
             Image {
                 id: windowIcon
                 property var iconSize: {
-                    return Math.min(targetWindowWidth, targetWindowHeight) * (root.compactMode ? root.iconToWindowRatioCompact : root.iconToWindowRatio) / (root.monitorData?.scale ?? 1);
+                    const renderedSize = Math.min(root.width, root.height);
+                    return renderedSize * (root.compactMode ? root.iconToWindowRatioCompact : root.iconToWindowRatio) / (root.monitorData?.scale ?? 1);
                 }
                 Layout.alignment: Qt.AlignHCenter
                 source: root.iconPath
                 width: iconSize
                 height: iconSize
-                sourceSize: Qt.size(iconSize, iconSize)
-
-                Behavior on width {
-                    animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
-                }
-                Behavior on height {
-                    animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
-                }
+                sourceSize: Qt.size(Math.max(1, Math.round(iconSize)), Math.max(1, Math.round(iconSize)))
             }
         }
     }
