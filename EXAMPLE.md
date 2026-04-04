@@ -50,6 +50,14 @@ Path: `~/.config/overzicht/settings.json`
     "scale": 0.12,
     "enable": true,
     "hideEmptyRows": false,
+    "useWorkspaceMap": false,
+    "workspaceMap": [],
+    "orderRightLeft": false,
+    "orderBottomUp": false,
+    "previewsEnabled": true,
+    "previewMode": "live",
+    "includeInactiveMonitorPreviews": true,
+    "previewRecaptureDelayMs": 60,
     "workspaceSpacing": 5,
     "backgroundPadding": 10,
     "workspaceNumberBaseSize": 250
@@ -64,7 +72,8 @@ Path: `~/.config/overzicht/settings.json`
     "inactiveMonitorOpacity": 0.4
   },
   "hacks": {
-    "arbitraryRaceConditionDelay": 150
+    "arbitraryRaceConditionDelay": 150,
+    "hyprlandEventDebounceMs": 40
   }
 }
 ```

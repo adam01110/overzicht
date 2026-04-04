@@ -30,39 +30,67 @@ Item { // Window
     property var iconToWindowRatio: Config.options.windowPreview.iconToWindowRatio
     property var xwaylandIndicatorToIconRatio: Config.options.windowPreview.xwaylandIndicatorToIconRatio
     property var iconToWindowRatioCompact: Config.options.windowPreview.iconToWindowRatioCompact
+    property bool previewsEnabled: Config.options.overview.previewsEnabled
+    property bool includeInactiveMonitorPreviews: Config.options.overview.includeInactiveMonitorPreviews
+    property int previewRecaptureDelayMs: Config.options.overview.previewRecaptureDelayMs
+    property string previewModeRaw: Config.options.overview.previewMode
+    property string previewMode: {
+        const mode = `${previewModeRaw ?? "live"}`.trim().toLowerCase();
+        return (mode === "event" || mode === "snapshot") ? "event" : "live";
+    }
+    property bool livePreviewEnabled: previewsEnabled && previewMode === "live"
+    property bool shouldCapturePreview: {
+        if (!GlobalStates.overviewOpen || !previewsEnabled || !previewCaptureEnabled)
+            return false;
+        if (includeInactiveMonitorPreviews)
+            return true;
+        return (windowData?.monitor ?? -1) === widgetMonitorId;
+    }
     property var entry: DesktopEntries.heuristicLookup(windowData?.class)
-    property var iconPath: Quickshell.iconPath(entry?.icon ?? windowData?.class ?? "application-x-executable", "image-missing")
+    property string iconName: {
+        const raw = `${entry?.icon ?? ""}`.trim();
+        const withoutProviderPrefix = raw.replace(/^image:\/\/icon\//, "");
+        const withoutQuery = withoutProviderPrefix.split("?")[0].trim();
+        return withoutQuery.length > 0 ? withoutQuery : "application-x-executable";
+    }
+    property var iconPath: Quickshell.iconPath(iconName, "image-missing")
     property bool compactMode: Appearance.font.pixelSize.smaller * 4 > targetWindowHeight || Appearance.font.pixelSize.smaller * 4 > targetWindowWidth
 
     property bool indicateXWayland: windowData?.xwayland ?? false
     property bool previewCaptureEnabled: true
+    property bool initialized: false
 
     x: initX
     y: initY
-    width: Math.min((windowData?.size[0] ?? 100) * root.scale, availableWorkspaceWidth)
-    height: Math.min((windowData?.size[1] ?? 100) * root.scale, availableWorkspaceHeight)
+    width: Math.min(targetWindowWidth, availableWorkspaceWidth)
+    height: Math.min(targetWindowHeight, availableWorkspaceHeight)
     opacity: (windowData?.monitor ?? -1) == widgetMonitorId ? 1 : Config.options.windowPreview.inactiveMonitorOpacity
 
     clip: true
+    Component.onCompleted: Qt.callLater(() => root.initialized = true)
 
     Behavior on x {
+        enabled: root.initialized
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
     Behavior on y {
+        enabled: root.initialized
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
     Behavior on width {
+        enabled: root.initialized
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
     Behavior on height {
+        enabled: root.initialized
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
 
     ScreencopyView {
         id: windowPreview
         anchors.fill: parent
-        captureSource: GlobalStates.overviewOpen && root.previewCaptureEnabled ? root.toplevel : null
-        live: true
+        captureSource: shouldCapturePreview ? root.toplevel : null
+        live: livePreviewEnabled
 
         Rectangle {
             anchors.fill: parent
@@ -100,7 +128,7 @@ Item { // Window
     }
 
     function refreshCapture() {
-        if (!GlobalStates.overviewOpen)
+        if (!GlobalStates.overviewOpen || livePreviewEnabled || !previewsEnabled)
             return;
 
         root.previewCaptureEnabled = false;
@@ -109,7 +137,7 @@ Item { // Window
 
     Timer {
         id: previewResetTimer
-        interval: 60
+        interval: Math.max(1, previewRecaptureDelayMs)
         repeat: false
         onTriggered: root.previewCaptureEnabled = true
     }

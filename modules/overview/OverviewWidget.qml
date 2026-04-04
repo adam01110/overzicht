@@ -14,9 +14,13 @@ Item {
     required property var panelWindow
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(panelWindow.screen)
     readonly property var toplevels: ToplevelManager.toplevels
+    readonly property int effectiveActiveWorkspaceId: Math.max(1, Math.min(100, monitor?.activeWorkspace?.id ?? 1))
     readonly property int workspacesShown: Config.options.overview.rows * Config.options.overview.columns
-    readonly property int workspaceGroup: Math.floor((monitor.activeWorkspace?.id - 1) / workspacesShown)
-    property bool monitorIsFocused: (Hyprland.focusedMonitor?.name == monitor.name)
+    readonly property bool useWorkspaceMap: Config.options.overview.useWorkspaceMap
+    readonly property var workspaceMap: Config.options.overview.workspaceMap
+    readonly property int workspaceOffset: useWorkspaceMap ? Number(workspaceMap[root.monitor?.id] ?? 0) : 0
+    readonly property int workspaceGroup: Math.floor((effectiveActiveWorkspaceId - workspaceOffset - 1) / workspacesShown)
+    property bool monitorIsFocused: Hyprland.focusedMonitor?.name == monitor.name
     property var windows: HyprlandData.windowList
     property var windowByAddress: HyprlandData.windowByAddress
     property var windowAddresses: HyprlandData.addresses
@@ -38,23 +42,47 @@ Item {
     property int draggingTargetWorkspace: -1
     property bool hideEmptyRows: Config.options.overview.hideEmptyRows
 
+    function getWorkspaceRow(workspaceId) {
+        if (!Number.isFinite(workspaceId))
+            return 0;
+
+        const adjusted = workspaceId - workspaceOffset;
+        const normalRow = Math.floor((adjusted - 1) / Config.options.overview.columns) % Config.options.overview.rows;
+        return Config.options.overview.orderBottomUp ? (Config.options.overview.rows - normalRow - 1) : normalRow;
+    }
+
+    function getWorkspaceColumn(workspaceId) {
+        if (!Number.isFinite(workspaceId))
+            return 0;
+
+        const adjusted = workspaceId - workspaceOffset;
+        const normalCol = (adjusted - 1) % Config.options.overview.columns;
+        return Config.options.overview.orderRightLeft ? (Config.options.overview.columns - normalCol - 1) : normalCol;
+    }
+
+    function getWorkspaceInCell(rowIndex, colIndex) {
+        const mappedRow = Config.options.overview.orderBottomUp ? (Config.options.overview.rows - rowIndex - 1) : rowIndex;
+        const mappedCol = Config.options.overview.orderRightLeft ? (Config.options.overview.columns - colIndex - 1) : colIndex;
+        return workspaceGroup * workspacesShown + mappedRow * Config.options.overview.columns + mappedCol + 1 + workspaceOffset;
+    }
+
     property var rowsWithContent: {
         if (!root.hideEmptyRows)
             return null;
 
         let rows = new Set();
-        const firstWorkspace = root.workspaceGroup * root.workspacesShown + 1;
-        const lastWorkspace = (root.workspaceGroup + 1) * root.workspacesShown;
+        const firstWorkspace = root.workspaceGroup * root.workspacesShown + 1 + workspaceOffset;
+        const lastWorkspace = (root.workspaceGroup + 1) * root.workspacesShown + workspaceOffset;
 
-        const currentWorkspace = monitor.activeWorkspace?.id ?? 1;
+        const currentWorkspace = effectiveActiveWorkspaceId;
         if (currentWorkspace >= firstWorkspace && currentWorkspace <= lastWorkspace)
-            rows.add(Math.floor((currentWorkspace - firstWorkspace) / Config.options.overview.columns));
+            rows.add(getWorkspaceRow(currentWorkspace));
 
         for (let addr in windowByAddress) {
             const win = windowByAddress[addr];
             const wsId = win?.workspace?.id;
             if (wsId >= firstWorkspace && wsId <= lastWorkspace)
-                rows.add(Math.floor((wsId - firstWorkspace) / Config.options.overview.columns));
+                rows.add(getWorkspaceRow(wsId));
         }
 
         return rows;
@@ -113,12 +141,11 @@ Item {
                     height: visible ? implicitHeight : 0
 
                     Repeater {
-                        // Workspace repeater
                         model: Config.options.overview.columns
                         Rectangle { // Workspace
                             id: workspace
                             property int colIndex: index
-                            property int workspaceValue: root.workspaceGroup * workspacesShown + rowIndex * Config.options.overview.columns + colIndex + 1
+                            property int workspaceValue: root.getWorkspaceInCell(rowIndex, colIndex)
                             property color defaultWorkspaceColor: Appearance.colors.colLayer1
                             property color hoveredWorkspaceColor: ColorUtils.mix(defaultWorkspaceColor, Appearance.colors.colLayer1Hover, 0.1)
                             property color hoveredBorderColor: Appearance.colors.colLayer2Hover
@@ -183,33 +210,26 @@ Item {
             implicitHeight: workspaceColumnLayout.implicitHeight
 
             Repeater {
-                // Window repeater
                 model: ScriptModel {
                     values: {
                         return ToplevelManager.toplevels.values.filter(toplevel => {
                             const address = `0x${toplevel.HyprlandToplevel.address}`;
                             var win = windowByAddress[address];
-                            const inWorkspaceGroup = (root.workspaceGroup * root.workspacesShown < win?.workspace?.id && win?.workspace?.id <= (root.workspaceGroup + 1) * root.workspacesShown);
-                            return inWorkspaceGroup;
+                            const minWorkspace = root.workspaceGroup * root.workspacesShown + 1 + workspaceOffset;
+                            const maxWorkspace = (root.workspaceGroup + 1) * root.workspacesShown + workspaceOffset;
+                            return minWorkspace <= win?.workspace?.id && win?.workspace?.id <= maxWorkspace;
                         }).sort((a, b) => {
-                            // Proper stacking order based on Hyprland's window properties
                             const addrA = `0x${a.HyprlandToplevel.address}`;
                             const addrB = `0x${b.HyprlandToplevel.address}`;
                             const winA = windowByAddress[addrA];
                             const winB = windowByAddress[addrB];
 
-                            // 1. Pinned windows are always on top
-                            if (winA?.pinned !== winB?.pinned) {
+                            if (winA?.pinned !== winB?.pinned)
                                 return winA?.pinned ? 1 : -1;
-                            }
 
-                            // 2. Floating windows above tiled windows
-                            if (winA?.floating !== winB?.floating) {
+                            if (winA?.floating !== winB?.floating)
                                 return winA?.floating ? 1 : -1;
-                            }
 
-                            // 3. Within same category, sort by focus history
-                            // Lower focusHistoryID = more recently focused = higher in stack
                             return (winB?.focusHistoryID ?? 0) - (winA?.focusHistoryID ?? 0);
                         });
                     }
@@ -225,21 +245,19 @@ Item {
                     toplevel: modelData
                     monitorData: monitor
 
-                    // Calculate scale relative to window's source monitor
+                    // Keep the fork's source-monitor scaling behavior while applying the new workspace mapping logic.
                     property real sourceMonitorWidth: (monitor?.transform % 2 === 1) ? (monitor?.height ?? 1920) / (monitor?.scale ?? 1) - (monitor?.reserved?.[0] ?? 0) - (monitor?.reserved?.[2] ?? 0) : (monitor?.width ?? 1920) / (monitor?.scale ?? 1) - (monitor?.reserved?.[0] ?? 0) - (monitor?.reserved?.[2] ?? 0)
                     property real sourceMonitorHeight: (monitor?.transform % 2 === 1) ? (monitor?.width ?? 1080) / (monitor?.scale ?? 1) - (monitor?.reserved?.[1] ?? 0) - (monitor?.reserved?.[3] ?? 0) : (monitor?.height ?? 1080) / (monitor?.scale ?? 1) - (monitor?.reserved?.[1] ?? 0) - (monitor?.reserved?.[3] ?? 0)
 
-                    // Scale windows to fit the workspace size, accounting for different monitor sizes
                     scale: Math.min(root.workspaceImplicitWidth / sourceMonitorWidth, root.workspaceImplicitHeight / sourceMonitorHeight)
-
                     availableWorkspaceWidth: root.workspaceImplicitWidth
                     availableWorkspaceHeight: root.workspaceImplicitHeight
                     widgetMonitorId: root.monitor.id
 
-                    property bool atInitPosition: (initX == x && initY == y)
+                    property bool atInitPosition: initX == x && initY == y
 
-                    property int workspaceColIndex: (windowData?.workspace.id - 1) % Config.options.overview.columns
-                    property int workspaceRowIndex: Math.floor((windowData?.workspace.id - 1) % root.workspacesShown / Config.options.overview.columns)
+                    property int workspaceColIndex: root.getWorkspaceColumn(windowData?.workspace.id)
+                    property int workspaceRowIndex: root.getWorkspaceRow(windowData?.workspace.id)
                     property int workspaceVisibleRowIndex: root.mappedRowIndex(workspaceRowIndex)
                     xOffset: (root.workspaceImplicitWidth + workspaceSpacing) * workspaceColIndex
                     yOffset: (root.workspaceImplicitHeight + workspaceSpacing) * workspaceVisibleRowIndex
@@ -250,12 +268,12 @@ Item {
                         repeat: false
                         running: false
                         onTriggered: {
-                            window.x = Math.round(Math.max((windowData?.at[0] - (monitor?.x ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * root.scale, 0) + xOffset);
-                            window.y = Math.round(Math.max((windowData?.at[1] - (monitor?.y ?? 0) - (monitorData?.reserved?.[1] ?? 0)) * root.scale, 0) + yOffset);
+                            window.x = Math.round(Math.max((windowData?.at[0] - (monitor?.x ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * window.scale, 0) + xOffset);
+                            window.y = Math.round(Math.max((windowData?.at[1] - (monitor?.y ?? 0) - (monitorData?.reserved?.[1] ?? 0)) * window.scale, 0) + yOffset);
                         }
                     }
 
-                    z: atInitPosition ? (root.windowZ + index) : root.windowDraggingZ
+                    z: atInitPosition ? root.windowZ + index : root.windowDraggingZ
                     Drag.hotSpot.x: targetWindowWidth / 2
                     Drag.hotSpot.y: targetWindowHeight / 2
                     MouseArea {
@@ -312,9 +330,8 @@ Item {
 
             Rectangle { // Focused workspace indicator
                 id: focusedWorkspaceIndicator
-                property int activeWorkspaceInGroup: monitor.activeWorkspace?.id - (root.workspaceGroup * root.workspacesShown)
-                property int activeWorkspaceRowIndex: Math.floor((activeWorkspaceInGroup - 1) / Config.options.overview.columns)
-                property int activeWorkspaceColIndex: (activeWorkspaceInGroup - 1) % Config.options.overview.columns
+                property int activeWorkspaceRowIndex: root.getWorkspaceRow(root.effectiveActiveWorkspaceId)
+                property int activeWorkspaceColIndex: root.getWorkspaceColumn(root.effectiveActiveWorkspaceId)
                 x: (root.workspaceImplicitWidth + workspaceSpacing) * activeWorkspaceColIndex
                 y: (root.workspaceImplicitHeight + workspaceSpacing) * root.mappedRowIndex(activeWorkspaceRowIndex)
                 z: root.windowZ
