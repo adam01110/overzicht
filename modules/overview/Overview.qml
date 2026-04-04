@@ -19,23 +19,22 @@ Scope {
             required property var modelData
             readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.screen)
             property bool monitorIsFocused: Hyprland.focusedMonitor?.id == monitor?.id
+            property bool blurEnabled: Config.options.overview.effects.enableBlur
+            property bool backdropEnabled: Config.options.overview.effects.enableBackdrop
+            property real backdropOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.backdropOpacity))
             screen: modelData
             visible: GlobalStates.overviewOpen
 
-            WlrLayershell.namespace: "overzicht"
+            WlrLayershell.namespace: blurEnabled ? "overzicht-blur" : "overzicht"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
             color: "transparent"
 
-            mask: Region {
-                item: GlobalStates.overviewOpen ? keyHandler : null
-            }
-
             anchors {
                 top: true
                 bottom: true
-                left: !(Config?.options.overview.enable ?? true)
-                right: !(Config?.options.overview.enable ?? true)
+                left: true
+                right: true
             }
 
             HyprlandFocusGrab {
@@ -68,14 +67,23 @@ Scope {
                 }
             }
 
-            implicitWidth: columnLayout.implicitWidth
-            implicitHeight: columnLayout.implicitHeight
+            implicitWidth: screen.width
+            implicitHeight: screen.height
 
             Item {
                 id: keyHandler
                 anchors.fill: parent
                 visible: GlobalStates.overviewOpen
                 focus: GlobalStates.overviewOpen
+                z: 0
+
+                Rectangle {
+                    anchors.fill: parent
+                    visible: root.backdropEnabled
+                    color: "#000000"
+                    opacity: root.backdropOpacity
+                    z: 0
+                }
 
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Escape || event.key === Qt.Key_Return) {
@@ -163,6 +171,7 @@ Scope {
                 id: columnLayout
                 visible: GlobalStates.overviewOpen
                 anchors.centerIn: parent
+                z: 1
 
                 Loader {
                     id: overviewLoader

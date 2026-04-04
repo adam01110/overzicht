@@ -113,6 +113,18 @@ Singleton {
             property real workspaceSpacing: root.optionValue(["overview", "workspaceSpacing"], 5)
             property real backgroundPadding: root.optionValue(["overview", "backgroundPadding"], 10)
             property real workspaceNumberBaseSize: root.optionValue(["overview", "workspaceNumberBaseSize"], 250)
+            property QtObject effects: QtObject {
+                property bool enableBackdrop: root.optionValue(["overview", "effects", "enableBackdrop"], false)
+                property real backdropOpacity: root.optionValue(["overview", "effects", "backdropOpacity"], 0.28)
+                property real panelOpacity: root.optionValue(["overview", "effects", "panelOpacity"], 0.92)
+                property real workspaceOpacity: root.optionValue(["overview", "effects", "workspaceOpacity"], 0.86)
+                property real windowOverlayOpacity: root.optionValue(["overview", "effects", "windowOverlayOpacity"], 0.22)
+                property bool enableBlur: root.optionValue(["overview", "effects", "enableBlur"], false)
+                property bool glassMode: root.optionValue(["overview", "effects", "glassMode"], false)
+                property real glassTintStrength: root.optionValue(["overview", "effects", "glassTintStrength"], 0.35)
+                property real glassBorderOpacity: root.optionValue(["overview", "effects", "glassBorderOpacity"], 0.72)
+                property real glassShineOpacity: root.optionValue(["overview", "effects", "glassShineOpacity"], 0.14)
+            }
         }
 
         property QtObject windowPreview: QtObject {

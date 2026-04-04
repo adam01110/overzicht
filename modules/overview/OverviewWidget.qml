@@ -37,6 +37,14 @@ Item {
     property int windowZ: 1
     property int windowDraggingZ: 99999
     property real workspaceSpacing: Config.options.overview.workspaceSpacing
+    property real panelOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.panelOpacity))
+    property real workspaceOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.workspaceOpacity))
+    property bool glassMode: Config.options.overview.effects.glassMode
+    property real glassTintStrength: Math.max(0, Math.min(1, Config.options.overview.effects.glassTintStrength))
+    property real glassBorderOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.glassBorderOpacity))
+    property real glassShineOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.glassShineOpacity))
+    property real effectivePanelOpacity: glassMode ? Math.min(panelOpacity, 0.72) : panelOpacity
+    property real effectiveWorkspaceOpacity: glassMode ? Math.min(workspaceOpacity, 0.62) : workspaceOpacity
 
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
@@ -120,10 +128,33 @@ Item {
 
         implicitWidth: workspaceColumnLayout.implicitWidth + padding * 2
         implicitHeight: workspaceColumnLayout.implicitHeight + padding * 2
-        radius: Appearance.rounding.screenRounding
-        color: Appearance.colors.colLayer0
+        radius: Appearance.rounding.screenRounding * root.scale + padding
+        clip: true
+        color: ColorUtils.applyAlpha(root.glassMode ? ColorUtils.mix(Appearance.colors.colLayer0, Appearance.colors.colLayer1, 0.78 - root.glassTintStrength * 0.35) : Appearance.colors.colLayer0, root.effectivePanelOpacity)
         border.width: 1
-        border.color: Appearance.colors.colLayer0Border
+        border.color: ColorUtils.applyAlpha(root.glassMode ? ColorUtils.mix(Appearance.colors.colLayer0Border, Appearance.m3colors.m3outline, 0.52) : Appearance.colors.colLayer0Border, root.glassMode ? root.glassBorderOpacity : root.effectivePanelOpacity)
+
+        Rectangle {
+            visible: root.glassMode
+            anchors.fill: parent
+            radius: parent.radius
+            color: "transparent"
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: ColorUtils.applyAlpha("#FFFFFF", root.glassShineOpacity * 0.35) }
+                GradientStop { position: 0.42; color: ColorUtils.applyAlpha("#FFFFFF", 0.0) }
+                GradientStop { position: 1.0; color: ColorUtils.applyAlpha("#000000", root.glassShineOpacity * 0.22) }
+            }
+        }
+
+        Rectangle {
+            visible: root.glassMode
+            anchors.fill: parent
+            anchors.margins: 1
+            radius: Math.max(parent.radius - 1, 0)
+            color: "transparent"
+            border.width: 1
+            border.color: ColorUtils.applyAlpha("#FFFFFF", root.glassBorderOpacity * 0.20)
+        }
 
         ColumnLayout { // Workspaces
             id: workspaceColumnLayout
@@ -153,10 +184,32 @@ Item {
 
                             implicitWidth: root.workspaceImplicitWidth
                             implicitHeight: root.workspaceImplicitHeight
-                            color: hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor
-                            radius: Appearance.rounding.screenRounding
+                            color: ColorUtils.applyAlpha(root.glassMode ? ColorUtils.mix(hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor, Appearance.colors.colLayer0, 0.46) : (hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor), root.effectiveWorkspaceOpacity)
+                            radius: Appearance.rounding.screenRounding * root.scale
                             border.width: 2
-                            border.color: hoveredWhileDragging ? hoveredBorderColor : "transparent"
+                            border.color: hoveredWhileDragging ? ColorUtils.applyAlpha(hoveredBorderColor, root.glassMode ? root.glassBorderOpacity : 1) : "transparent"
+
+                            Rectangle {
+                                visible: root.glassMode
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: "transparent"
+                                gradient: Gradient {
+                                    GradientStop { position: 0.0; color: ColorUtils.applyAlpha("#FFFFFF", root.glassShineOpacity * 0.22) }
+                                    GradientStop { position: 0.46; color: ColorUtils.applyAlpha("#FFFFFF", 0.0) }
+                                    GradientStop { position: 1.0; color: ColorUtils.applyAlpha("#000000", root.glassShineOpacity * 0.14) }
+                                }
+                            }
+
+                            Rectangle {
+                                visible: root.glassMode
+                                anchors.fill: parent
+                                anchors.margins: 1
+                                radius: Math.max(parent.radius - 1, 0)
+                                color: "transparent"
+                                border.width: 1
+                                border.color: ColorUtils.applyAlpha("#FFFFFF", root.glassBorderOpacity * 0.16)
+                            }
 
                             StyledText {
                                 anchors.centerIn: parent
@@ -245,7 +298,6 @@ Item {
                     toplevel: modelData
                     monitorData: monitor
 
-                    // Keep the fork's source-monitor scaling behavior while applying the new workspace mapping logic.
                     property real sourceMonitorWidth: (monitor?.transform % 2 === 1) ? (monitor?.height ?? 1920) / (monitor?.scale ?? 1) - (monitor?.reserved?.[0] ?? 0) - (monitor?.reserved?.[2] ?? 0) : (monitor?.width ?? 1920) / (monitor?.scale ?? 1) - (monitor?.reserved?.[0] ?? 0) - (monitor?.reserved?.[2] ?? 0)
                     property real sourceMonitorHeight: (monitor?.transform % 2 === 1) ? (monitor?.width ?? 1080) / (monitor?.scale ?? 1) - (monitor?.reserved?.[1] ?? 0) - (monitor?.reserved?.[3] ?? 0) : (monitor?.height ?? 1080) / (monitor?.scale ?? 1) - (monitor?.reserved?.[1] ?? 0) - (monitor?.reserved?.[3] ?? 0)
 
