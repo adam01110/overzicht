@@ -95,10 +95,12 @@ Additional optional settings:
 Special workspace notes:
 
 - `showSpecialWorkspaces` adds a strip below the normal workspace grid.
-- `specialWorkspaces` can predeclare names that should always appear in that strip.
+- `specialWorkspaces` can predeclare names that should always appear in that strip, even when they are empty.
 - `specialWorkspaceColumns` controls how many special-workspace tiles are shown per row.
 - The strip shows active special workspaces plus any preconfigured names.
-- Dragging onto the `+` tile can create a new special workspace automatically.
+- Predeclaring names is useful for fixed workflows such as `stash`, `music`, or `scratch`.
+- The special strip shows active special workspaces plus any names you preconfigure.
+- Dragging onto the `+` tile can auto-create a new special workspace even when none is currently open or predeclared.
 
 Visual effects notes:
 
