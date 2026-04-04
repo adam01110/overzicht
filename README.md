@@ -76,6 +76,9 @@ Additional optional settings:
 - `overview.previewMode`
 - `overview.includeInactiveMonitorPreviews`
 - `overview.previewRecaptureDelayMs`
+- `overview.showSpecialWorkspaces`
+- `overview.specialWorkspaces`
+- `overview.specialWorkspaceColumns`
 - `overview.effects.enableBackdrop`
 - `overview.effects.backdropOpacity`
 - `overview.effects.panelOpacity`
@@ -87,6 +90,12 @@ Additional optional settings:
 - `overview.effects.glassBorderOpacity`
 - `overview.effects.glassShineOpacity`
 - `hacks.hyprlandEventDebounceMs`
+
+Special workspace notes:
+
+- `showSpecialWorkspaces` adds a strip below the normal workspace grid.
+- `specialWorkspaces` can predeclare names that should always appear in that strip.
+- `specialWorkspaceColumns` controls how many special-workspace tiles are shown per row.
 
 Visual effects notes:
 
