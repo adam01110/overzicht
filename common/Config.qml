@@ -99,6 +99,7 @@ Singleton {
             property string previewMode: root.optionValue(["overview", "previewMode"], "live")
             property bool includeInactiveMonitorPreviews: root.optionValue(["overview", "includeInactiveMonitorPreviews"], true)
             property int previewRecaptureDelayMs: root.optionValue(["overview", "previewRecaptureDelayMs"], 60)
+            property string emptyWorkspaceWallpaper: root.optionValue(["overview", "emptyWorkspaceWallpaper"], "")
             property real workspaceSpacing: root.optionValue(["overview", "workspaceSpacing"], 5)
             property real backgroundPadding: root.optionValue(["overview", "backgroundPadding"], 10)
             property real workspaceNumberBaseSize: root.optionValue(["overview", "workspaceNumberBaseSize"], 250)
@@ -107,6 +108,7 @@ Singleton {
                 property real backdropOpacity: root.optionValue(["overview", "effects", "backdropOpacity"], 0.28)
                 property real panelOpacity: root.optionValue(["overview", "effects", "panelOpacity"], 0.92)
                 property real workspaceOpacity: root.optionValue(["overview", "effects", "workspaceOpacity"], 0.86)
+                property real emptyWorkspaceWallpaperOverlayOpacity: root.optionValue(["overview", "effects", "emptyWorkspaceWallpaperOverlayOpacity"], 0.18)
                 property real windowOverlayOpacity: root.optionValue(["overview", "effects", "windowOverlayOpacity"], 0.22)
             }
         }

@@ -48,11 +48,13 @@ Path: `~/.config/overzicht/settings.json`
     "previewMode": "live",
     "includeInactiveMonitorPreviews": true,
     "previewRecaptureDelayMs": 60,
+    "emptyWorkspaceWallpaper": "",
     "effects": {
       "enableBackdrop": false,
       "backdropOpacity": 0.28,
       "panelOpacity": 0.92,
       "workspaceOpacity": 0.86,
+      "emptyWorkspaceWallpaperOverlayOpacity": 0.18,
       "windowOverlayOpacity": 0.22
     },
     "workspaceSpacing": 5,
