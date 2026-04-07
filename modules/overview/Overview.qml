@@ -147,12 +147,7 @@ Scope {
                             targetId = minWorkspaceId + 9;
                     }
 
-                    if (targetId === null && (
-                        event.key === Qt.Key_Left || event.key === Qt.Key_H ||
-                        event.key === Qt.Key_Right || event.key === Qt.Key_L ||
-                        event.key === Qt.Key_Up || event.key === Qt.Key_K ||
-                        event.key === Qt.Key_Down || event.key === Qt.Key_J
-                    )) {
+                    if (targetId === null && (event.key === Qt.Key_Left || event.key === Qt.Key_H || event.key === Qt.Key_Right || event.key === Qt.Key_L || event.key === Qt.Key_Up || event.key === Qt.Key_K || event.key === Qt.Key_Down || event.key === Qt.Key_J)) {
                         const targetNormalRow = toNormalRow(targetVisualRow);
                         const targetNormalColumn = toNormalColumn(targetVisualColumn);
                         targetId = minWorkspaceId + targetNormalRow * columns + targetNormalColumn;

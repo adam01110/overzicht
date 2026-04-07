@@ -192,10 +192,7 @@ Item {
                                 visible: workspace.showWallpaper
                                 anchors.fill: parent
                                 radius: parent.radius
-                                color: ColorUtils.applyAlpha(
-                                    workspace.hoveredWhileDragging ? workspace.hoveredWorkspaceColor : workspace.defaultWorkspaceColor,
-                                    workspace.hoveredWhileDragging ? Math.min(0.28, root.emptyWorkspaceWallpaperOverlayOpacity + 0.08) : root.emptyWorkspaceWallpaperOverlayOpacity
-                                )
+                                color: ColorUtils.applyAlpha(workspace.hoveredWhileDragging ? workspace.hoveredWorkspaceColor : workspace.defaultWorkspaceColor, workspace.hoveredWhileDragging ? Math.min(0.28, root.emptyWorkspaceWallpaperOverlayOpacity + 0.08) : root.emptyWorkspaceWallpaperOverlayOpacity)
                             }
 
                             StyledText {
