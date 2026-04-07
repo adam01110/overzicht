@@ -56,17 +56,6 @@ Singleton {
 
     property QtObject options: QtObject {
         property QtObject appearance: QtObject {
-            property QtObject rounding: QtObject {
-                property int unsharpen: root.optionValue(["appearance", "rounding", "unsharpen"], 0)
-                property int verysmall: root.optionValue(["appearance", "rounding", "verysmall"], 0)
-                property int small: root.optionValue(["appearance", "rounding", "small"], 0)
-                property int normal: root.optionValue(["appearance", "rounding", "normal"], 0)
-                property int large: root.optionValue(["appearance", "rounding", "large"], 0)
-                property int full: root.optionValue(["appearance", "rounding", "full"], 0)
-                property int screenRounding: root.optionValue(["appearance", "rounding", "screenRounding"], 0)
-                property int windowRounding: root.optionValue(["appearance", "rounding", "windowRounding"], 0)
-            }
-
             property QtObject font: QtObject {
                 property QtObject family: QtObject {
                     property string main: root.optionValue(["appearance", "font", "family", "main"], "sans-serif")
@@ -113,6 +102,13 @@ Singleton {
             property real workspaceSpacing: root.optionValue(["overview", "workspaceSpacing"], 5)
             property real backgroundPadding: root.optionValue(["overview", "backgroundPadding"], 10)
             property real workspaceNumberBaseSize: root.optionValue(["overview", "workspaceNumberBaseSize"], 250)
+            property QtObject effects: QtObject {
+                property bool enableBackdrop: root.optionValue(["overview", "effects", "enableBackdrop"], false)
+                property real backdropOpacity: root.optionValue(["overview", "effects", "backdropOpacity"], 0.28)
+                property real panelOpacity: root.optionValue(["overview", "effects", "panelOpacity"], 0.92)
+                property real workspaceOpacity: root.optionValue(["overview", "effects", "workspaceOpacity"], 0.86)
+                property real windowOverlayOpacity: root.optionValue(["overview", "effects", "windowOverlayOpacity"], 0.22)
+            }
         }
 
         property QtObject windowPreview: QtObject {

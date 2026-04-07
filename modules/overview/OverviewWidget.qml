@@ -37,6 +37,8 @@ Item {
     property int windowZ: 1
     property int windowDraggingZ: 99999
     property real workspaceSpacing: Config.options.overview.workspaceSpacing
+    property real panelOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.panelOpacity))
+    property real workspaceOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.workspaceOpacity))
 
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
@@ -120,10 +122,11 @@ Item {
 
         implicitWidth: workspaceColumnLayout.implicitWidth + padding * 2
         implicitHeight: workspaceColumnLayout.implicitHeight + padding * 2
-        radius: Appearance.rounding.screenRounding
-        color: Appearance.colors.colLayer0
+        radius: 0
+        clip: true
+        color: ColorUtils.applyAlpha(Appearance.colors.colLayer0, root.panelOpacity)
         border.width: 1
-        border.color: Appearance.colors.colLayer0Border
+        border.color: ColorUtils.applyAlpha(Appearance.colors.colLayer0Border, root.panelOpacity)
 
         ColumnLayout { // Workspaces
             id: workspaceColumnLayout
@@ -153,8 +156,8 @@ Item {
 
                             implicitWidth: root.workspaceImplicitWidth
                             implicitHeight: root.workspaceImplicitHeight
-                            color: hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor
-                            radius: Appearance.rounding.screenRounding
+                            color: ColorUtils.applyAlpha(hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor, root.workspaceOpacity)
+                            radius: 0
                             border.width: 2
                             border.color: hoveredWhileDragging ? hoveredBorderColor : "transparent"
 
@@ -245,7 +248,6 @@ Item {
                     toplevel: modelData
                     monitorData: monitor
 
-                    // Keep the fork's source-monitor scaling behavior while applying the new workspace mapping logic.
                     property real sourceMonitorWidth: (monitor?.transform % 2 === 1) ? (monitor?.height ?? 1920) / (monitor?.scale ?? 1) - (monitor?.reserved?.[0] ?? 0) - (monitor?.reserved?.[2] ?? 0) : (monitor?.width ?? 1920) / (monitor?.scale ?? 1) - (monitor?.reserved?.[0] ?? 0) - (monitor?.reserved?.[2] ?? 0)
                     property real sourceMonitorHeight: (monitor?.transform % 2 === 1) ? (monitor?.width ?? 1080) / (monitor?.scale ?? 1) - (monitor?.reserved?.[1] ?? 0) - (monitor?.reserved?.[3] ?? 0) : (monitor?.height ?? 1080) / (monitor?.scale ?? 1) - (monitor?.reserved?.[1] ?? 0) - (monitor?.reserved?.[3] ?? 0)
 
@@ -338,7 +340,7 @@ Item {
                 width: root.workspaceImplicitWidth
                 height: root.workspaceImplicitHeight
                 color: "transparent"
-                radius: Appearance.rounding.screenRounding
+                radius: 0
                 border.width: 2
                 border.color: root.activeBorderColor
                 Behavior on x {

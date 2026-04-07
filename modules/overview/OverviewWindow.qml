@@ -33,6 +33,7 @@ Item { // Window
     property bool previewsEnabled: Config.options.overview.previewsEnabled
     property bool includeInactiveMonitorPreviews: Config.options.overview.includeInactiveMonitorPreviews
     property int previewRecaptureDelayMs: Config.options.overview.previewRecaptureDelayMs
+    property real windowOverlayOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.windowOverlayOpacity))
     property string previewModeRaw: Config.options.overview.previewMode
     property string previewMode: {
         const mode = `${previewModeRaw ?? "live"}`.trim().toLowerCase();
@@ -94,8 +95,8 @@ Item { // Window
 
         Rectangle {
             anchors.fill: parent
-            radius: Appearance.rounding.windowRounding
-            color: pressed ? ColorUtils.transparentize(Appearance.colors.colLayer2Active, 0.5) : hovered ? ColorUtils.transparentize(Appearance.colors.colLayer2Hover, 0.7) : ColorUtils.transparentize(Appearance.colors.colLayer2)
+            radius: 0
+            color: pressed ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Active, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Hover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.applyAlpha(Appearance.colors.colLayer2, root.windowOverlayOpacity)
             border.color: ColorUtils.transparentize(Appearance.m3colors.m3outline, 0.7)
             border.width: 1
         }

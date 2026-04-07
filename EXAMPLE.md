@@ -9,16 +9,6 @@ Path: `~/.config/overzicht/settings.json`
 ```json
 {
   "appearance": {
-    "rounding": {
-      "unsharpen": 0,
-      "verysmall": 0,
-      "small": 0,
-      "normal": 0,
-      "large": 0,
-      "full": 0,
-      "screenRounding": 0,
-      "windowRounding": 0
-    },
     "font": {
       "family": {
         "main": "sans-serif",
@@ -58,6 +48,13 @@ Path: `~/.config/overzicht/settings.json`
     "previewMode": "live",
     "includeInactiveMonitorPreviews": true,
     "previewRecaptureDelayMs": 60,
+    "effects": {
+      "enableBackdrop": false,
+      "backdropOpacity": 0.28,
+      "panelOpacity": 0.92,
+      "workspaceOpacity": 0.86,
+      "windowOverlayOpacity": 0.22
+    },
     "workspaceSpacing": 5,
     "backgroundPadding": 10,
     "workspaceNumberBaseSize": 250
