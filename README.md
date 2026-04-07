@@ -11,7 +11,7 @@ It is controlled over Quickshell IPC and is designed for keyboard-first workflow
 - Open: `overzicht ipc call overview open`
 - Close: `overzicht ipc call overview close`
 
-`WlrLayershell.namespace` is `overzicht` by default and `overzicht-blur` when blur is enabled.
+`WlrLayershell.namespace` is `overzicht`.
 
 ## Preview
 
@@ -81,7 +81,6 @@ Additional optional settings:
 - `overview.effects.panelOpacity`
 - `overview.effects.workspaceOpacity`
 - `overview.effects.windowOverlayOpacity`
-- `overview.effects.enableBlur`
 - `overview.effects.glassMode`
 - `overview.effects.glassTintStrength`
 - `overview.effects.glassBorderOpacity`
@@ -91,7 +90,6 @@ Additional optional settings:
 Visual effects notes:
 
 - `enableBackdrop` adds a dimmed full-screen backdrop behind the overview.
-- `enableBlur` switches the layer namespace to `overzicht-blur` so Hyprland blur rules can target it separately.
 - `glassMode` uses the configured opacities plus highlight/border tinting for a glass-style panel look.
 
 For full JSON examples of both runtime files, see [`EXAMPLE.md`](EXAMPLE.md).

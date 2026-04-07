@@ -10,14 +10,14 @@ Path: `~/.config/overzicht/settings.json`
 {
   "appearance": {
     "rounding": {
-      "unsharpen": 0,
-      "verysmall": 0,
-      "small": 0,
-      "normal": 0,
-      "large": 0,
-      "full": 0,
-      "screenRounding": 0,
-      "windowRounding": 0
+      "unsharpen": 2,
+      "verysmall": 8,
+      "small": 12,
+      "normal": 17,
+      "large": 23,
+      "full": 9999,
+      "screenRounding": 23,
+      "windowRounding": 18
     },
     "font": {
       "family": {
@@ -64,7 +64,6 @@ Path: `~/.config/overzicht/settings.json`
       "panelOpacity": 0.92,
       "workspaceOpacity": 0.86,
       "windowOverlayOpacity": 0.22,
-      "enableBlur": false,
       "glassMode": false,
       "glassTintStrength": 0.35,
       "glassBorderOpacity": 0.72,

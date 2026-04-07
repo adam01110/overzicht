@@ -19,13 +19,12 @@ Scope {
             required property var modelData
             readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.screen)
             property bool monitorIsFocused: Hyprland.focusedMonitor?.id == monitor?.id
-            property bool blurEnabled: Config.options.overview.effects.enableBlur
             property bool backdropEnabled: Config.options.overview.effects.enableBackdrop
             property real backdropOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.backdropOpacity))
             screen: modelData
             visible: GlobalStates.overviewOpen
 
-            WlrLayershell.namespace: blurEnabled ? "overzicht-blur" : "overzicht"
+            WlrLayershell.namespace: "overzicht"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
             color: "transparent"

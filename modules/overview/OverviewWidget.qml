@@ -128,7 +128,7 @@ Item {
 
         implicitWidth: workspaceColumnLayout.implicitWidth + padding * 2
         implicitHeight: workspaceColumnLayout.implicitHeight + padding * 2
-        radius: Appearance.rounding.screenRounding * root.scale + padding
+        radius: Appearance.rounding.screenRounding * root.scale
         clip: true
         color: ColorUtils.applyAlpha(root.glassMode ? ColorUtils.mix(Appearance.colors.colLayer0, Appearance.colors.colLayer1, 0.78 - root.glassTintStrength * 0.35) : Appearance.colors.colLayer0, root.effectivePanelOpacity)
         border.width: 1
