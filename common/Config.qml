@@ -56,17 +56,6 @@ Singleton {
 
     property QtObject options: QtObject {
         property QtObject appearance: QtObject {
-            property QtObject rounding: QtObject {
-                property int unsharpen: root.optionValue(["appearance", "rounding", "unsharpen"], 2)
-                property int verysmall: root.optionValue(["appearance", "rounding", "verysmall"], 8)
-                property int small: root.optionValue(["appearance", "rounding", "small"], 12)
-                property int normal: root.optionValue(["appearance", "rounding", "normal"], 17)
-                property int large: root.optionValue(["appearance", "rounding", "large"], 23)
-                property int full: root.optionValue(["appearance", "rounding", "full"], 9999)
-                property int screenRounding: root.optionValue(["appearance", "rounding", "screenRounding"], large)
-                property int windowRounding: root.optionValue(["appearance", "rounding", "windowRounding"], 18)
-            }
-
             property QtObject font: QtObject {
                 property QtObject family: QtObject {
                     property string main: root.optionValue(["appearance", "font", "family", "main"], "sans-serif")
@@ -119,10 +108,6 @@ Singleton {
                 property real panelOpacity: root.optionValue(["overview", "effects", "panelOpacity"], 0.92)
                 property real workspaceOpacity: root.optionValue(["overview", "effects", "workspaceOpacity"], 0.86)
                 property real windowOverlayOpacity: root.optionValue(["overview", "effects", "windowOverlayOpacity"], 0.22)
-                property bool glassMode: root.optionValue(["overview", "effects", "glassMode"], false)
-                property real glassTintStrength: root.optionValue(["overview", "effects", "glassTintStrength"], 0.35)
-                property real glassBorderOpacity: root.optionValue(["overview", "effects", "glassBorderOpacity"], 0.72)
-                property real glassShineOpacity: root.optionValue(["overview", "effects", "glassShineOpacity"], 0.14)
             }
         }
 

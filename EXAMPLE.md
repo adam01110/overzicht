@@ -9,16 +9,6 @@ Path: `~/.config/overzicht/settings.json`
 ```json
 {
   "appearance": {
-    "rounding": {
-      "unsharpen": 2,
-      "verysmall": 8,
-      "small": 12,
-      "normal": 17,
-      "large": 23,
-      "full": 9999,
-      "screenRounding": 23,
-      "windowRounding": 18
-    },
     "font": {
       "family": {
         "main": "sans-serif",
@@ -63,11 +53,7 @@ Path: `~/.config/overzicht/settings.json`
       "backdropOpacity": 0.28,
       "panelOpacity": 0.92,
       "workspaceOpacity": 0.86,
-      "windowOverlayOpacity": 0.22,
-      "glassMode": false,
-      "glassTintStrength": 0.35,
-      "glassBorderOpacity": 0.72,
-      "glassShineOpacity": 0.14
+      "windowOverlayOpacity": 0.22
     },
     "workspaceSpacing": 5,
     "backgroundPadding": 10,

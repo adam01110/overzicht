@@ -34,6 +34,10 @@ Compared to the quickshell-overview project, the following functionality was rem
   (`useMatugenColors` and `Appearance.colors.qml` template flow).
 - Color source selection and Caelestia live sync
   (`appearance.colorSource`, Caelestia integration, and related live theme sync).
+- Configurable corner rounding
+  (`appearance.rounding`; overview corners are now always square).
+- Glass-mode visual styling
+  (`overview.effects.glassMode` and related glass tint/border/shine settings).
 
 ## Flake Outputs
 
@@ -81,16 +85,11 @@ Additional optional settings:
 - `overview.effects.panelOpacity`
 - `overview.effects.workspaceOpacity`
 - `overview.effects.windowOverlayOpacity`
-- `overview.effects.glassMode`
-- `overview.effects.glassTintStrength`
-- `overview.effects.glassBorderOpacity`
-- `overview.effects.glassShineOpacity`
 - `hacks.hyprlandEventDebounceMs`
 
 Visual effects notes:
 
 - `enableBackdrop` adds a dimmed full-screen backdrop behind the overview.
-- `glassMode` uses the configured opacities plus highlight/border tinting for a glass-style panel look.
 
 For full JSON examples of both runtime files, see [`EXAMPLE.md`](EXAMPLE.md).
 
