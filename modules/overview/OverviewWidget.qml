@@ -37,12 +37,15 @@ Item {
     property int windowZ: 1
     property int windowDraggingZ: 99999
     property real workspaceSpacing: Config.options.overview.workspaceSpacing
+    property string emptyWorkspaceWallpaperPath: Config.options.overview.emptyWorkspaceWallpaper
     property real panelOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.panelOpacity))
     property real workspaceOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.workspaceOpacity))
+    property real emptyWorkspaceWallpaperOverlayOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.emptyWorkspaceWallpaperOverlayOpacity))
 
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
     property bool hideEmptyRows: Config.options.overview.hideEmptyRows
+    readonly property bool hasEmptyWorkspaceWallpaper: `${emptyWorkspaceWallpaperPath ?? ""}`.trim().length > 0
 
     function getWorkspaceRow(workspaceId) {
         if (!Number.isFinite(workspaceId))
@@ -66,6 +69,17 @@ Item {
         const mappedRow = Config.options.overview.orderBottomUp ? (Config.options.overview.rows - rowIndex - 1) : rowIndex;
         const mappedCol = Config.options.overview.orderRightLeft ? (Config.options.overview.columns - colIndex - 1) : colIndex;
         return workspaceGroup * workspacesShown + mappedRow * Config.options.overview.columns + mappedCol + 1 + workspaceOffset;
+    }
+
+    function wallpaperSource(path) {
+        const trimmed = `${path ?? ""}`.trim();
+        if (trimmed.length === 0)
+            return "";
+        if (trimmed.startsWith("file:/") || trimmed.startsWith("qrc:/") || trimmed.startsWith("image://") || trimmed.startsWith("http://") || trimmed.startsWith("https://"))
+            return trimmed;
+        if (trimmed.startsWith("/"))
+            return `file://${trimmed}`;
+        return trimmed;
     }
 
     property var rowsWithContent: {
@@ -114,7 +128,7 @@ Item {
     StyledRectangularShadow {
         target: overviewBackground
     }
-    Rectangle { // Background
+    Rectangle {
         id: overviewBackground
         property real padding: Config.options.overview.backgroundPadding
         anchors.fill: parent
@@ -128,7 +142,7 @@ Item {
         border.width: 1
         border.color: ColorUtils.applyAlpha(Appearance.colors.colLayer0Border, root.panelOpacity)
 
-        ColumnLayout { // Workspaces
+        ColumnLayout {
             id: workspaceColumnLayout
 
             z: root.workspaceZ
@@ -145,10 +159,11 @@ Item {
 
                     Repeater {
                         model: Config.options.overview.columns
-                        Rectangle { // Workspace
+                        Rectangle {
                             id: workspace
                             property int colIndex: index
                             property int workspaceValue: root.getWorkspaceInCell(rowIndex, colIndex)
+                            property bool showWallpaper: root.hasEmptyWorkspaceWallpaper
                             property color defaultWorkspaceColor: Appearance.colors.colLayer1
                             property color hoveredWorkspaceColor: ColorUtils.mix(defaultWorkspaceColor, Appearance.colors.colLayer1Hover, 0.1)
                             property color hoveredBorderColor: Appearance.colors.colLayer2Hover
@@ -156,13 +171,36 @@ Item {
 
                             implicitWidth: root.workspaceImplicitWidth
                             implicitHeight: root.workspaceImplicitHeight
-                            color: ColorUtils.applyAlpha(hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor, root.workspaceOpacity)
+                            clip: showWallpaper
+                            color: showWallpaper ? "transparent" : ColorUtils.applyAlpha(hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor, root.workspaceOpacity)
                             radius: 0
                             border.width: 2
                             border.color: hoveredWhileDragging ? hoveredBorderColor : "transparent"
 
+                            Image {
+                                visible: workspace.showWallpaper
+                                anchors.fill: parent
+                                source: root.wallpaperSource(root.emptyWorkspaceWallpaperPath)
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                cache: true
+                                smooth: true
+                                mipmap: true
+                            }
+
+                            Rectangle {
+                                visible: workspace.showWallpaper
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: ColorUtils.applyAlpha(
+                                    workspace.hoveredWhileDragging ? workspace.hoveredWorkspaceColor : workspace.defaultWorkspaceColor,
+                                    workspace.hoveredWhileDragging ? Math.min(0.28, root.emptyWorkspaceWallpaperOverlayOpacity + 0.08) : root.emptyWorkspaceWallpaperOverlayOpacity
+                                )
+                            }
+
                             StyledText {
                                 anchors.centerIn: parent
+                                visible: !workspace.showWallpaper
                                 text: workspaceValue
                                 font {
                                     pixelSize: root.workspaceNumberSize * root.scale
@@ -206,7 +244,7 @@ Item {
             }
         }
 
-        Item { // Windows & focused workspace indicator
+        Item {
             id: windowSpace
             anchors.centerIn: parent
             implicitWidth: workspaceColumnLayout.implicitWidth
@@ -330,7 +368,7 @@ Item {
                 }
             }
 
-            Rectangle { // Focused workspace indicator
+            Rectangle {
                 id: focusedWorkspaceIndicator
                 property int activeWorkspaceRowIndex: root.getWorkspaceRow(root.effectiveActiveWorkspaceId)
                 property int activeWorkspaceColIndex: root.getWorkspaceColumn(root.effectiveActiveWorkspaceId)

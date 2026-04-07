@@ -80,16 +80,24 @@ Additional optional settings:
 - `overview.previewMode`
 - `overview.includeInactiveMonitorPreviews`
 - `overview.previewRecaptureDelayMs`
+- `overview.emptyWorkspaceWallpaper`
 - `overview.effects.enableBackdrop`
 - `overview.effects.backdropOpacity`
 - `overview.effects.panelOpacity`
 - `overview.effects.workspaceOpacity`
+- `overview.effects.emptyWorkspaceWallpaperOverlayOpacity`
 - `overview.effects.windowOverlayOpacity`
 - `hacks.hyprlandEventDebounceMs`
 
 Visual effects notes:
 
 - `enableBackdrop` adds a dimmed full-screen backdrop behind the overview.
+Visual effects notes:
+
+- `enableBackdrop` adds a dimmed full-screen backdrop behind the overview.
+- `emptyWorkspaceWallpaperOverlayOpacity` controls the tint applied over wallpaper-backed tiles.
+- `emptyWorkspaceWallpaper` sets a background image for normal workspace tiles.
+- `emptyWorkspaceWallpaperOverlayOpacity` controls the tint applied over wallpaper-backed tiles.
 
 For full JSON examples of both runtime files, see [`EXAMPLE.md`](EXAMPLE.md).
 
