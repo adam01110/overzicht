@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import "../common"
 
 /**
  * Provides access to some Hyprland data not available in Quickshell.Hyprland.
@@ -20,6 +21,11 @@ Singleton {
     property var activeWorkspace: null
     property var monitors: []
     property var layers: ({})
+    property bool pendingWindowsUpdate: false
+    property bool pendingMonitorsUpdate: false
+    property bool pendingLayersUpdate: false
+    property bool pendingWorkspacesUpdate: false
+    property bool pendingActiveWorkspaceUpdate: false
 
     function updateWindowList() {
         getClients.running = true;
@@ -39,10 +45,46 @@ Singleton {
     }
 
     function updateAll() {
-        updateWindowList();
-        updateMonitors();
-        updateLayers();
-        updateWorkspaces();
+        scheduleUpdates(true, true, true, true, true);
+    }
+
+    function scheduleUpdates(windows, monitors, layers, workspaces, activeWorkspace) {
+        pendingWindowsUpdate = pendingWindowsUpdate || !!windows;
+        pendingMonitorsUpdate = pendingMonitorsUpdate || !!monitors;
+        pendingLayersUpdate = pendingLayersUpdate || !!layers;
+        pendingWorkspacesUpdate = pendingWorkspacesUpdate || !!workspaces;
+        pendingActiveWorkspaceUpdate = pendingActiveWorkspaceUpdate || !!activeWorkspace;
+
+        const debounceMs = Math.max(0, Config.options.hacks.hyprlandEventDebounceMs);
+        if (debounceMs === 0) {
+            flushPendingUpdates();
+        } else {
+            eventDebounceTimer.interval = debounceMs;
+            eventDebounceTimer.restart();
+        }
+    }
+
+    function flushPendingUpdates() {
+        if (pendingWindowsUpdate) {
+            pendingWindowsUpdate = false;
+            updateWindowList();
+        }
+        if (pendingMonitorsUpdate) {
+            pendingMonitorsUpdate = false;
+            updateMonitors();
+        }
+        if (pendingLayersUpdate) {
+            pendingLayersUpdate = false;
+            updateLayers();
+        }
+        if (pendingWorkspacesUpdate) {
+            pendingWorkspacesUpdate = false;
+            getWorkspaces.running = true;
+        }
+        if (pendingActiveWorkspaceUpdate) {
+            pendingActiveWorkspaceUpdate = false;
+            getActiveWorkspace.running = true;
+        }
     }
 
     function biggestWindowForWorkspace(workspaceId) {
@@ -55,15 +97,42 @@ Singleton {
     }
 
     Component.onCompleted: {
-        updateAll();
+        scheduleUpdates(true, true, true, true, true);
+        flushPendingUpdates();
     }
 
     Connections {
         target: Hyprland
 
         function onRawEvent(event) {
-            updateAll();
+            const eventName = `${event?.name ?? event?.event ?? event?.type ?? ""}`;
+            if (["openlayer", "closelayer", "screencast"].includes(eventName))
+                return;
+
+            if (eventName === "openwindow" || eventName === "closewindow" || eventName === "movewindow" || eventName === "movewindowv2" || eventName === "windowtitle") {
+                scheduleUpdates(true, false, false, true, false);
+                return;
+            }
+
+            if (eventName === "workspace" || eventName === "workspacev2" || eventName === "focusedmon" || eventName === "focusedmonv2" || eventName === "activewindow" || eventName === "activewindowv2") {
+                scheduleUpdates(false, false, false, true, true);
+                return;
+            }
+
+            if (eventName.startsWith("monitor") || eventName === "configreloaded") {
+                scheduleUpdates(true, true, false, true, true);
+                return;
+            }
+
+            scheduleUpdates(true, true, true, true, true);
         }
+    }
+
+    Timer {
+        id: eventDebounceTimer
+        interval: Math.max(0, Config.options.hacks.hyprlandEventDebounceMs)
+        repeat: false
+        onTriggered: root.flushPendingUpdates()
     }
 
     Process {

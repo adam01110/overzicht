@@ -102,6 +102,14 @@ Singleton {
             property real scale: root.optionValue(["overview", "scale"], 0.12)
             property bool enable: root.optionValue(["overview", "enable"], true)
             property bool hideEmptyRows: root.optionValue(["overview", "hideEmptyRows"], false)
+            property bool useWorkspaceMap: root.optionValue(["overview", "useWorkspaceMap"], false)
+            property var workspaceMap: root.optionValue(["overview", "workspaceMap"], [])
+            property bool orderRightLeft: root.optionValue(["overview", "orderRightLeft"], false)
+            property bool orderBottomUp: root.optionValue(["overview", "orderBottomUp"], false)
+            property bool previewsEnabled: root.optionValue(["overview", "previewsEnabled"], true)
+            property string previewMode: root.optionValue(["overview", "previewMode"], "live")
+            property bool includeInactiveMonitorPreviews: root.optionValue(["overview", "includeInactiveMonitorPreviews"], true)
+            property int previewRecaptureDelayMs: root.optionValue(["overview", "previewRecaptureDelayMs"], 60)
             property real workspaceSpacing: root.optionValue(["overview", "workspaceSpacing"], 5)
             property real backgroundPadding: root.optionValue(["overview", "backgroundPadding"], 10)
             property real workspaceNumberBaseSize: root.optionValue(["overview", "workspaceNumberBaseSize"], 250)
@@ -116,6 +124,7 @@ Singleton {
 
         property QtObject hacks: QtObject {
             property int arbitraryRaceConditionDelay: root.optionValue(["hacks", "arbitraryRaceConditionDelay"], 150)
+            property int hyprlandEventDebounceMs: root.optionValue(["hacks", "hyprlandEventDebounceMs"], 40)
         }
     }
 }

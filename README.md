@@ -66,6 +66,18 @@ Optional setting: `overview.hideEmptyRows` (default `false`) hides workspace
 rows in the active group that contain no windows, while keeping the current
 workspace row visible.
 
+Additional optional settings:
+
+- `overview.useWorkspaceMap`
+- `overview.workspaceMap`
+- `overview.orderRightLeft`
+- `overview.orderBottomUp`
+- `overview.previewsEnabled`
+- `overview.previewMode`
+- `overview.includeInactiveMonitorPreviews`
+- `overview.previewRecaptureDelayMs`
+- `hacks.hyprlandEventDebounceMs`
+
 For full JSON examples of both runtime files, see [`EXAMPLE.md`](EXAMPLE.md).
 
 ## NixOS Module
