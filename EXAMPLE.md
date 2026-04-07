@@ -54,9 +54,6 @@ Path: `~/.config/overzicht/settings.json`
     "backgroundPadding": 10,
     "workspaceNumberBaseSize": 250
   },
-  "position": {
-    "topMargin": 100
-  },
   "windowPreview": {
     "iconToWindowRatio": 0.25,
     "iconToWindowRatioCompact": 0.45,
