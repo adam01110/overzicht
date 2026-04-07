@@ -107,10 +107,6 @@ Singleton {
             property real workspaceNumberBaseSize: root.optionValue(["overview", "workspaceNumberBaseSize"], 250)
         }
 
-        property QtObject position: QtObject {
-            property real topMargin: root.optionValue(["position", "topMargin"], 100)
-        }
-
         property QtObject windowPreview: QtObject {
             property real iconToWindowRatio: root.optionValue(["windowPreview", "iconToWindowRatio"], 0.25)
             property real iconToWindowRatioCompact: root.optionValue(["windowPreview", "iconToWindowRatioCompact"], 0.45)

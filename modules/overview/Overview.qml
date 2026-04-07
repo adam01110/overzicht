@@ -147,9 +147,7 @@ Scope {
             ColumnLayout {
                 id: columnLayout
                 visible: GlobalStates.overviewOpen
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: Config.options.position.topMargin
+                anchors.centerIn: parent
 
                 Loader {
                     id: overviewLoader
