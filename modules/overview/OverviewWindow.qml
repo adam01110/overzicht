@@ -97,7 +97,7 @@ Item { // Window
             anchors.fill: parent
             radius: 0
             color: pressed ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Active, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Hover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.applyAlpha(Appearance.colors.colLayer2, root.windowOverlayOpacity)
-            border.color: ColorUtils.transparentize(Appearance.m3colors.m3outline, 0.7)
+            border.color: ColorUtils.transparentize(Appearance.palette.outline, 0.7)
             border.width: 1
         }
 
