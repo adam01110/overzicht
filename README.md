@@ -1,7 +1,5 @@
 <div align="center">
-  <img src="./assets/screenshot.png" alt="Overzicht preview" width="640" />
-
-# Overzicht
+  # Overzicht
 
   Standalone Quickshell workspace overview for Hyprland with live window previews, drag-and-drop moves, and Nix-first integration.
 
@@ -16,6 +14,10 @@
 </div>
 
 Overzicht is a full-screen workspace switcher built as a standalone Quickshell package. It renders the current workspace group as a grid, shows live or event-driven window previews, and talks to Hyprland directly for focus, workspace switching, and window moves.
+
+<div align="center">
+  <img src="./assets/screenshot.png" alt="Overzicht preview" width="640" />
+</div>
 
 ## Overview
 
