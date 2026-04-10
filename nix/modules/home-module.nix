@@ -1,17 +1,21 @@
 {
+  # keep-sorted start
   config,
   lib,
   pkgs,
+  # keep-sorted end
   ...
 }: let
   inherit
     (lib)
-    mkEnableOption
-    mkOption
-    mkIf
+    # keep-sorted start
     getExe
-    types
     literalExpression
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    # keep-sorted end
     ;
   inherit (pkgs) callPackage;
 
@@ -26,9 +30,14 @@
     else jsonFormat.generate name value;
 in {
   options.programs.overzicht = {
-    enable = mkEnableOption "quickshell overview shell";
+    # keep-sorted start block=yes newline_separated=yes
+    colors = mkOption {
+      type = types.oneOf [jsonFormat.type types.str types.path];
+      default = {};
+      description = "Colors written to `~/.config/overzicht/colors.json`.";
+    };
 
-    systemd.enable = mkEnableOption "systemd user service for overzicht";
+    enable = mkEnableOption "quickshell overview shell";
 
     package = mkOption {
       type = types.package;
@@ -43,20 +52,20 @@ in {
       description = "Settings written to `~/.config/overzicht/settings.json`.";
     };
 
-    colors = mkOption {
-      type = types.oneOf [jsonFormat.type types.str types.path];
-      default = {};
-      description = "Colors written to `~/.config/overzicht/colors.json`.";
-    };
+    systemd.enable = mkEnableOption "systemd user service for overzicht";
+    # keep-sorted end
   };
 
   config = mkIf cfg.enable {
-    home.packages = [cfg.package];
+    # keep-sorted start block=yes newline_separated=yes
+    assertions = [
+      {
+        assertion = cfg.package != null || !cfg.systemd.enable;
+        message = "programs.overzicht.package cannot be null when systemd is enabled.";
+      }
+    ];
 
-    xdg.configFile = {
-      "overzicht/settings.json".source = generateJson "overzicht-settings.json" cfg.settings;
-      "overzicht/colors.json".source = generateJson "overzicht-colors.json" cfg.colors;
-    };
+    home.packages = [cfg.package];
 
     systemd.user.services.overzicht = mkIf cfg.systemd.enable {
       Unit = {
@@ -74,11 +83,11 @@ in {
       Install.WantedBy = ["graphical-session.target"];
     };
 
-    assertions = [
-      {
-        assertion = cfg.package != null || !cfg.systemd.enable;
-        message = "programs.overzicht.package cannot be null when systemd is enabled.";
-      }
-    ];
+    xdg.configFile = {
+      "overzicht/settings.json".source = generateJson "overzicht-settings.json" cfg.settings;
+      "overzicht/colors.json".source = generateJson "overzicht-colors.json" cfg.colors;
+    };
+
+    # keep-sorted end
   };
 }

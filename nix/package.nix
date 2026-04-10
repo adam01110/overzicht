@@ -1,13 +1,17 @@
 {
+  # keep-sorted start
   lib,
-  stdenvNoCC,
   makeWrapper,
   quickshell,
+  stdenvNoCC,
+  # keep-sorted end
 }: let
   inherit
     (lib)
+    # keep-sorted start
     cleanSource
     getExe
+    # keep-sorted end
     ;
 in
   stdenvNoCC.mkDerivation {
@@ -31,9 +35,10 @@ in
       runHook postInstall
     '';
 
-    meta = with lib; {
+    meta = {
       description = "Quickshell-based workspace overview";
+      homepage = "https://github.com/adam01110/overzicht";
       mainProgram = "overzicht";
-      platforms = platforms.linux;
+      platforms = lib.platforms.linux;
     };
   }

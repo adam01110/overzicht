@@ -1,23 +1,28 @@
 {
+  # keep-sorted start
   config,
   lib,
   pkgs,
+  # keep-sorted end
   ...
 }: let
   inherit
     (lib)
-    mkEnableOption
-    mkOption
-    literalExpression
-    mkIf
+    # keep-sorted start
     getExe
+    literalExpression
+    mkEnableOption
+    mkIf
+    mkOption
     types
+    # keep-sorted end
     ;
   inherit (pkgs) callPackage;
 
   cfg = config.services.overzicht;
 in {
   options.services.overzicht = {
+    # keep-sorted start block=yes newline_separated=yes
     enable = mkEnableOption "overzicht user service";
 
     package = mkOption {
@@ -32,9 +37,11 @@ in {
       default = "graphical-session.target";
       description = "User systemd target for overzicht.";
     };
+    # keep-sorted end
   };
 
   config = mkIf cfg.enable {
+    # keep-sorted start block=yes newline_separated=yes
     environment.systemPackages = [cfg.package];
 
     systemd.user.services.overzicht = {
@@ -49,5 +56,6 @@ in {
         RestartSec = 1;
       };
     };
+    # keep-sorted end
   };
 }
