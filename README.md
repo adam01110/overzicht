@@ -1,14 +1,16 @@
 <div align="center">
-  # Overzicht
+  <h1>Overzicht</h1>
 
-  Standalone Quickshell workspace overview for Hyprland with live window previews, drag-and-drop moves, and Nix-first integration.
+  <p>Standalone Quickshell workspace overview for Hyprland with live window previews, drag-and-drop moves, and Nix-first integration.</p>
 
+  [![CI](https://img.shields.io/github/actions/workflow/status/adam01110/overzicht/ci.yml?branch=main&style=flat-square&label=CI&labelColor=504945&color=cc241d)](https://github.com/adam01110/overzicht/actions/workflows/ci.yml)
+  [![Repo Size](https://img.shields.io/github/repo-size/adam01110/overzicht?style=flat-square&label=repo%20size&labelColor=504945&color=3c3836)](https://github.com/adam01110/overzicht)
   [![Nix](https://img.shields.io/badge/Nix-flakes-689d6a?style=flat-square&labelColor=504945&logo=nixos&logoColor=ebdbb2)](https://nixos.wiki/wiki/Flakes)
   [![Hyprland](https://img.shields.io/badge/Hyprland-supported-458588?style=flat-square&labelColor=504945&color=458588)](https://hypr.land)
   [![Quickshell](https://img.shields.io/badge/Quickshell-QML-b16286?style=flat-square&labelColor=504945&color=b16286)](https://quickshell.outfoxxed.me/)
   [![Qt6](https://img.shields.io/badge/Qt-6-98971a?style=flat-square&labelColor=504945&logo=qt&logoColor=ebdbb2)](https://www.qt.io/)
   [![Linux](https://img.shields.io/badge/platform-linux-fe8019?style=flat-square&labelColor=504945&color=fe8019)](https://kernel.org)
-  [![License](https://img.shields.io/badge/License-unlicensed-cc241d?style=flat-square&labelColor=504945&color=cc241d)](https://github.com/adam01110/overzicht)
+  [![License](https://img.shields.io/badge/License-GPLv3-cc241d?style=flat-square&labelColor=504945&color=8ec07c)](./LICENCE)
 
   [Overview](#overview) - [Features](#features) - [Removed From Upstream](#removed-from-upstream) - [Installation](#installation) - [Configuration](#configuration) - [Development](#development) - [Notes](#notes)
 </div>

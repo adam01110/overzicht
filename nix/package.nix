@@ -35,10 +35,13 @@ in
       runHook postInstall
     '';
 
-    meta = {
+    meta = with lib; {
+      # keep-sorted start
       description = "Quickshell-based workspace overview";
       homepage = "https://github.com/adam01110/overzicht";
+      license = licenses.gpl3Only;
       mainProgram = "overzicht";
-      platforms = lib.platforms.linux;
+      platforms = platforms.linux;
+      # keep-sorted end
     };
   }
