@@ -1,2 +1,6 @@
-.rumdl_cache
+# keep-sorted start
 vaguesyntax_quickshell
+.direnv
+.rumdl_cache
+result*
+# keep-sorted end
