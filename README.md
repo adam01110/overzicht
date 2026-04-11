@@ -10,7 +10,7 @@
   [![Quickshell](https://img.shields.io/badge/Quickshell-QML-b16286?style=flat-square&labelColor=504945&color=b16286)](https://quickshell.outfoxxed.me/)
   [![Qt6](https://img.shields.io/badge/Qt-6-98971a?style=flat-square&labelColor=504945&logo=qt&logoColor=ebdbb2)](https://www.qt.io/)
   [![Linux](https://img.shields.io/badge/platform-linux-fe8019?style=flat-square&labelColor=504945&color=fe8019)](https://kernel.org)
-  [![License](https://img.shields.io/badge/License-GPLv3-cc241d?style=flat-square&labelColor=504945&color=8ec07c)](./LICENCE)
+  [![License](https://img.shields.io/badge/License-GPLv3-cc241d?style=flat-square&labelColor=504945&color=8ec07c)](./LICENSE)
 
   [Overview](#overview) - [Features](#features) - [Removed From Upstream](#removed-from-upstream) - [Installation](#installation) - [Configuration](#configuration) - [Development](#development) - [Notes](#notes)
 </div>
