@@ -27,8 +27,8 @@ in {
 
     package = mkOption {
       type = types.package;
-      default = callPackage ./package.nix {};
-      defaultText = literalExpression "callPackage ./package.nix {}";
+      default = callPackage ../package.nix {};
+      defaultText = literalExpression "callPackage ../package.nix {}";
       description = "Package that provides the `overzicht` executable.";
     };
 
