@@ -156,9 +156,13 @@ Scope {
                     let targetId = null;
 
                     if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
-                        targetVisualColumn = (targetVisualColumn - 1 + columns) % columns;
+                        const targetVisualIndex = (targetVisualRow * columns + targetVisualColumn - 1 + workspacesPerGroup) % workspacesPerGroup;
+                        targetVisualRow = Math.floor(targetVisualIndex / columns);
+                        targetVisualColumn = targetVisualIndex % columns;
                     } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
-                        targetVisualColumn = (targetVisualColumn + 1) % columns;
+                        const targetVisualIndex = (targetVisualRow * columns + targetVisualColumn + 1) % workspacesPerGroup;
+                        targetVisualRow = Math.floor(targetVisualIndex / columns);
+                        targetVisualColumn = targetVisualIndex % columns;
                     } else if (event.key === Qt.Key_Up || event.key === Qt.Key_K) {
                         targetVisualRow = (targetVisualRow - 1 + rows) % rows;
                     } else if (event.key === Qt.Key_Down || event.key === Qt.Key_J) {
