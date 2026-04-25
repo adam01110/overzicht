@@ -91,6 +91,7 @@ Singleton {
             property real scale: root.optionValue(["overview", "scale"], 0.12)
             property bool enable: root.optionValue(["overview", "enable"], true)
             property bool hideEmptyRows: root.optionValue(["overview", "hideEmptyRows"], false)
+            property bool closeOnFocusLoss: root.optionValue(["overview", "closeOnFocusLoss"], true)
             property bool useWorkspaceMap: root.optionValue(["overview", "useWorkspaceMap"], false)
             property var workspaceMap: root.optionValue(["overview", "workspaceMap"], [])
             property bool orderRightLeft: root.optionValue(["overview", "orderRightLeft"], false)

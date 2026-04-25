@@ -21,6 +21,7 @@ Scope {
             property bool monitorIsFocused: Hyprland.focusedMonitor?.id == monitor?.id
             property bool backdropEnabled: Config.options.overview.effects.enableBackdrop
             property real backdropOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.backdropOpacity))
+            property bool closeOnFocusLoss: Config.options.overview.closeOnFocusLoss ?? true
             screen: modelData
             visible: GlobalStates.overviewOpen
 
@@ -42,7 +43,7 @@ Scope {
                 property bool canBeActive: root.monitorIsFocused
                 active: false
                 onCleared: () => {
-                    if (!active)
+                    if (root.closeOnFocusLoss && !active && canBeActive)
                         GlobalStates.overviewOpen = false;
                 }
             }
@@ -52,6 +53,19 @@ Scope {
                 function onOverviewOpenChanged() {
                     if (GlobalStates.overviewOpen)
                         delayedGrabTimer.start();
+                }
+            }
+
+            Connections {
+                target: Hyprland
+                function onFocusedMonitorChanged() {
+                    if (!GlobalStates.overviewOpen)
+                        return;
+
+                    if (root.monitorIsFocused && !grab.active)
+                        grab.active = true;
+                    else if (!root.monitorIsFocused && grab.active)
+                        grab.active = false;
                 }
             }
 
@@ -82,6 +96,17 @@ Scope {
                     color: "#000000"
                     opacity: root.backdropOpacity
                     z: 0
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                    enabled: root.closeOnFocusLoss && GlobalStates.overviewOpen
+                    z: 0
+                    onPressed: mouse => {
+                        GlobalStates.overviewOpen = false;
+                        mouse.accepted = true;
+                    }
                 }
 
                 Keys.onPressed: event => {

@@ -142,6 +142,12 @@ Item {
         border.width: 1
         border.color: ColorUtils.applyAlpha(Appearance.colors.colLayer0Border, root.panelOpacity)
 
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+            onPressed: mouse => mouse.accepted = true
+        }
+
         ColumnLayout {
             id: workspaceColumnLayout
 

@@ -37,6 +37,7 @@ Overzicht is a full-screen workspace switcher built as a standalone Quickshell p
 - Middle-click a window preview to close it.
 - Drag a window preview onto another workspace tile to move it there.
 - Keyboard navigation with arrow keys or `h/j/k/l`.
+- Optional auto-close on focus loss or outside click.
 - Optional reversed row and column ordering.
 - Optional per-monitor workspace offsets through `workspaceMap`.
 - Optional empty-row hiding within the active workspace group.
@@ -138,6 +139,7 @@ Keyboard controls while the overview is open:
 - `1` to `9` jump to the matching workspace position in the current group.
 - `0` jumps to position 10 when the grid has at least ten cells.
 - `Return` and `Escape` close the overlay.
+- Clicking outside the overview closes it when `overview.closeOnFocusLoss` is enabled.
 
 ## Configuration
 
@@ -158,6 +160,12 @@ Main groups:
 - `overview`
 - `windowPreview`
 - `hacks`
+
+Useful `overview` toggles include:
+
+- `hideEmptyRows` to collapse unused workspace rows in the current group.
+- `closeOnFocusLoss` to dismiss the overview on outside click or focus-grab loss. Defaults to `true`.
+- `useWorkspaceMap` and `workspaceMap` for per-monitor workspace offsets.
 
 > [!TIP]
 > `previewMode` accepts `live` and event-driven values such as `event` or `snapshot`. For the full schema and examples, use [`EXAMPLE.md`](./EXAMPLE.md).

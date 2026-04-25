@@ -57,6 +57,8 @@ Path: `~/.config/overzicht/settings.json`
     "enable": true,
     // Hides rows that have no windows and are not the active workspace row.
     "hideEmptyRows": false,
+    // Closes the overview when clicking outside it or when the focus grab is cleared.
+    "closeOnFocusLoss": true,
     // Enables per-monitor workspace offsets from workspaceMap when grouping workspaces.
     "useWorkspaceMap": false,
     // Monitor-id keyed workspace start offsets used when useWorkspaceMap is enabled.
