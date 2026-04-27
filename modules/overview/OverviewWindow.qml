@@ -39,6 +39,7 @@ Item { // Window
         const mode = `${previewModeRaw ?? "live"}`.trim().toLowerCase();
         return (mode === "event" || mode === "snapshot") ? "event" : "live";
     }
+    property bool showIcons: Config.options.windowPreview.showIcons
     property bool livePreviewEnabled: previewsEnabled && previewMode === "live"
     property bool shouldCapturePreview: {
         if (!GlobalStates.overviewOpen || !previewsEnabled || !previewCaptureEnabled)
@@ -109,6 +110,7 @@ Item { // Window
 
             Image {
                 id: windowIcon
+                visible: root.showIcons
                 property var iconSize: {
                     return Math.min(targetWindowWidth, targetWindowHeight) * (root.compactMode ? root.iconToWindowRatioCompact : root.iconToWindowRatio) / (root.monitorData?.scale ?? 1);
                 }

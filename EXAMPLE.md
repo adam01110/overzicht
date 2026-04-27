@@ -99,6 +99,8 @@ Path: `~/.config/overzicht/settings.json`
     "workspaceNumberBaseSize": 250
   },
   "windowPreview": {
+    // Show application icons centered over window previews.
+    "showIcons": true,
     // Icon size ratio for normal window previews.
     "iconToWindowRatio": 0.25,
     // Larger icon size ratio used when a preview is too small for the normal layout.

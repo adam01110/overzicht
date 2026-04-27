@@ -167,6 +167,10 @@ Useful `overview` toggles include:
 - `closeOnFocusLoss` to dismiss the overview on outside click or focus-grab loss. Defaults to `true`.
 - `useWorkspaceMap` and `workspaceMap` for per-monitor workspace offsets.
 
+Useful `windowPreview` toggles include:
+
+- `showIcons` to show or hide application icons centered over window previews. Defaults to `true`.
+
 > [!TIP]
 > `previewMode` accepts `live` and event-driven values such as `event` or `snapshot`. For the full schema and examples, use [`EXAMPLE.md`](./EXAMPLE.md).
 

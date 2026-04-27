@@ -115,6 +115,7 @@ Singleton {
         }
 
         property QtObject windowPreview: QtObject {
+            property bool showIcons: root.optionValue(["windowPreview", "showIcons"], true)
             property real iconToWindowRatio: root.optionValue(["windowPreview", "iconToWindowRatio"], 0.25)
             property real iconToWindowRatioCompact: root.optionValue(["windowPreview", "iconToWindowRatioCompact"], 0.45)
             property real xwaylandIndicatorToIconRatio: root.optionValue(["windowPreview", "xwaylandIndicatorToIconRatio"], 0.35)
