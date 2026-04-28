@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -30,6 +31,7 @@ Item { // Window
     property var iconToWindowRatio: Config.options.windowPreview.iconToWindowRatio
     property var xwaylandIndicatorToIconRatio: Config.options.windowPreview.xwaylandIndicatorToIconRatio
     property var iconToWindowRatioCompact: Config.options.windowPreview.iconToWindowRatioCompact
+    property bool cropToFill: Config.options.windowPreview.cropToFill
     property bool previewsEnabled: Config.options.overview.previewsEnabled
     property bool includeInactiveMonitorPreviews: Config.options.overview.includeInactiveMonitorPreviews
     property int previewRecaptureDelayMs: Config.options.overview.previewRecaptureDelayMs
@@ -67,6 +69,13 @@ Item { // Window
     width: Math.min(targetWindowWidth, availableWorkspaceWidth)
     height: Math.min(targetWindowHeight, availableWorkspaceHeight)
     opacity: (windowData?.monitor ?? -1) == widgetMonitorId ? 1 : Config.options.windowPreview.inactiveMonitorOpacity
+    visible: {
+        const thisWsId = windowData?.workspace?.id;
+        const isFullscreen = (windowData?.fullscreen ?? 0) > 0;
+        if (isFullscreen || thisWsId === undefined)
+            return true;
+        return !HyprlandData.windowList.some(w => w.workspace?.id === thisWsId && (w.fullscreen ?? 0) > 0);
+    }
 
     clip: true
     Component.onCompleted: Qt.callLater(() => root.initialized = true)
@@ -88,19 +97,44 @@ Item { // Window
         animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
     }
 
+    // Opaque background for windows on the active monitor.
+    // The simplest solution for making those windows fully opaque and not interacting with actual
+    // windows behind the overview, e.g., applying blur to them.
+    Rectangle {
+        visible: (root.windowData?.monitor ?? -1) === root.widgetMonitorId
+        anchors.fill: parent
+        radius: Appearance.rounding.windowRounding * root.scale
+        color: Appearance.colors.colLayer1
+    }
+
     ScreencopyView {
         id: windowPreview
-        anchors.fill: parent
+        readonly property real srcAspect: {
+            const w = root.windowData?.size?.[0] ?? 0;
+            const h = root.windowData?.size?.[1] ?? 0;
+            return (w > 0 && h > 0) ? (w / h) : 1;
+        }
+        anchors.centerIn: parent
+        width: root.cropToFill ? Math.max(parent.width, parent.height * srcAspect) : Math.min(parent.width, parent.height * srcAspect)
+        height: root.cropToFill ? Math.max(parent.height, parent.width / srcAspect) : Math.min(parent.height, parent.width / srcAspect)
         captureSource: shouldCapturePreview ? root.toplevel : null
         live: livePreviewEnabled
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 0
-            color: root.pressed ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Active, Math.min(1, root.windowOverlayOpacity + 0.30)) : root.hovered ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Hover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.transparentize(Appearance.colors.colLayer2)
-            border.color: ColorUtils.transparentize(Appearance.palette.outline, 0.7)
-            border.width: 1
+        layer.enabled: true
+        layer.smooth: true
+        layer.effect: MultiEffect {
+            maskEnabled: true
+            maskSource: previewMask
+            maskThresholdMin: 0.5
+            maskSpreadAtMin: 1.0
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: Appearance.rounding.windowRounding * root.scale
+        color: pressed ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Active, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Hover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.transparentize(Appearance.colors.colLayer2)
+        border.color: ColorUtils.transparentize(Appearance.palette.outline, 0.7)
+        border.width: 1
 
         ColumnLayout {
             anchors.verticalCenter: parent.verticalCenter
@@ -127,6 +161,22 @@ Item { // Window
                     animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
                 }
             }
+        }
+    }
+
+    Item {
+        id: previewMask
+        width: windowPreview.width
+        height: windowPreview.height
+        anchors.centerIn: parent
+        visible: false
+        layer.enabled: true
+        layer.smooth: true
+        Rectangle {
+            anchors.centerIn: parent
+            width: root.width
+            height: root.height
+            radius: Appearance.rounding.windowRounding * root.scale
         }
     }
 

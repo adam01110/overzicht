@@ -170,6 +170,7 @@ Useful `overview` toggles include:
 Useful `windowPreview` toggles include:
 
 - `showIcons` to show or hide application icons centered over window previews. Defaults to `true`.
+- `cropToFill` to crop full-screen previews to fill the workspace tile when `true`; defaults to `false` so the full preview remains visible with possible padding bars.
 
 > [!TIP]
 > `previewMode` accepts `live` and event-driven values such as `event` or `snapshot`. For the full schema and examples, use [`EXAMPLE.md`](./EXAMPLE.md).

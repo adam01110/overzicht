@@ -108,7 +108,9 @@ Path: `~/.config/overzicht/settings.json`
     // Reserved XWayland indicator ratio; exposed in config but not currently rendered.
     "xwaylandIndicatorToIconRatio": 0.35,
     // Opacity applied to preview windows that belong to a different monitor than the current overview panel.
-    "inactiveMonitorOpacity": 0.4
+    "inactiveMonitorOpacity": 0.4,
+    // Crop full-screen previews to fill the workspace tile. When false, the full preview remains visible with possible padding bars.
+    "cropToFill": false
   },
   "hacks": {
     // Small delay used before focus grabs and some window-position recalculations to avoid timing issues.

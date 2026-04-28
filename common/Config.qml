@@ -120,6 +120,7 @@ Singleton {
             property real iconToWindowRatioCompact: root.optionValue(["windowPreview", "iconToWindowRatioCompact"], 0.45)
             property real xwaylandIndicatorToIconRatio: root.optionValue(["windowPreview", "xwaylandIndicatorToIconRatio"], 0.35)
             property real inactiveMonitorOpacity: root.optionValue(["windowPreview", "inactiveMonitorOpacity"], 0.4)
+            property bool cropToFill: root.optionValue(["windowPreview", "cropToFill"], false)
         }
 
         property QtObject hacks: QtObject {
