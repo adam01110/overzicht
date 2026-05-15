@@ -26,6 +26,25 @@ Singleton {
     property bool pendingLayersUpdate: false
     property bool pendingWorkspacesUpdate: false
     property bool pendingActiveWorkspaceUpdate: false
+    property int atLeastVersion: 55
+    property bool isModern: false
+
+    Process {
+        // Hyprland 0.55 changed dispatcher syntax; keep both paths available.
+        id: getVersion
+        command: ["hyprctl", "version", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const data = JSON.parse(text);
+                    const parts = data.version.split(".").map(Number);
+                    root.isModern = parts[1] >= root.atLeastVersion;
+                } catch (e) {
+                    console.warn("Failed to parse Hyprland version:", e);
+                }
+            }
+        }
+    }
 
     function updateWindowList() {
         getClients.running = true;
@@ -99,6 +118,7 @@ Singleton {
     Component.onCompleted: {
         scheduleUpdates(true, true, true, true, true);
         flushPendingUpdates();
+        getVersion.running = true;
     }
 
     Connections {
