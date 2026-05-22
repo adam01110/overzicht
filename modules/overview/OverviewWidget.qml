@@ -244,7 +244,7 @@ Item {
                                 onClicked: {
                                     if (root.draggingTargetWorkspace === -1) {
                                         GlobalStates.overviewOpen = false;
-                                        if (HyprlandData.isModern)
+                                        if (Hyprland.usingLua)
                                             Hyprland.dispatch(`hl.dsp.focus({workspace = '${workspaceValue}'})`);
                                         else
                                             Hyprland.dispatch(`workspace ${workspaceValue}`);
@@ -366,7 +366,7 @@ Item {
                             window.Drag.active = false;
                             root.draggingFromWorkspace = -1;
                             if (targetWorkspace !== -1 && targetWorkspace !== windowData?.workspace.id) {
-                                if (HyprlandData.isModern)
+                                if (Hyprland.usingLua)
                                     Hyprland.dispatch(`hl.dsp.window.move({workspace = '${targetWorkspace}', follow = false, window = 'address:${window.windowData?.address}'})`);
                                 else
                                     Hyprland.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${window.windowData?.address}`);
@@ -382,14 +382,14 @@ Item {
 
                             if (event.button === Qt.LeftButton) {
                                 GlobalStates.overviewOpen = false;
-                                if (HyprlandData.isModern)
+                                if (Hyprland.usingLua)
                                     Hyprland.dispatch(`hl.dsp.focus({ window = 'address:${windowData.address}' })`);
                                 else
                                     Hyprland.dispatch(`focuswindow address:${windowData.address}`);
                                 event.accepted = true;
                             } else if (event.button === Qt.MiddleButton) {
-                                if (HyprlandData.isModern)
-                                    Hyprland.dispatch(`hl.dsp.window.close({window = 'address:${windowData.address}'})`);
+                                if (Hyprland.usingLua)
+                                    Hyprland.dispatch(`hl.dsp.window.close('address:${windowData.address}')`);
                                 else
                                     Hyprland.dispatch(`closewindow address:${windowData.address}`);
                                 event.accepted = true;
