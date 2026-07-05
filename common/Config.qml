@@ -56,6 +56,17 @@ Singleton {
 
     property QtObject options: QtObject {
         property QtObject appearance: QtObject {
+            property QtObject rounding: QtObject {
+                property int unsharpen: root.optionValue(["appearance", "rounding", "unsharpen"], 2)
+                property int verysmall: root.optionValue(["appearance", "rounding", "verysmall"], 8)
+                property int small: root.optionValue(["appearance", "rounding", "small"], 12)
+                property int normal: root.optionValue(["appearance", "rounding", "normal"], 17)
+                property int large: root.optionValue(["appearance", "rounding", "large"], 23)
+                property int full: root.optionValue(["appearance", "rounding", "full"], 9999)
+                property int screenRounding: root.optionValue(["appearance", "rounding", "screenRounding"], large)
+                property int windowRounding: root.optionValue(["appearance", "rounding", "windowRounding"], 18)
+            }
+
             property QtObject font: QtObject {
                 property QtObject family: QtObject {
                     property string main: root.optionValue(["appearance", "font", "family", "main"], "sans-serif")

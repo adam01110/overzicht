@@ -114,14 +114,14 @@ Singleton {
     }
 
     rounding: QtObject {
-        property int unsharpen: 0
-        property int verysmall: 0
-        property int small: 0
-        property int normal: 0
-        property int large: 0
-        property int full: 0
-        property int screenRounding: 0
-        property int windowRounding: 0
+        property int unsharpen: Config.options.appearance.rounding.unsharpen
+        property int verysmall: Config.options.appearance.rounding.verysmall
+        property int small: Config.options.appearance.rounding.small
+        property int normal: Config.options.appearance.rounding.normal
+        property int large: Config.options.appearance.rounding.large
+        property int full: Config.options.appearance.rounding.full
+        property int screenRounding: Config.options.appearance.rounding.screenRounding
+        property int windowRounding: Config.options.appearance.rounding.windowRounding
     }
 
     font: QtObject {

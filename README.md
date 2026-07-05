@@ -2,7 +2,7 @@
 
   # overzicht
 
-  A standalone Quickshell workspace overview for Hyprland.
+  A personal-use fork of `quickshell-overview`, a Quickshell workspace overview for Hyprland.
 
   [![Repo Size](https://img.shields.io/github/repo-size/adam01110/overzicht?style=flat-square&label=repo%20size&labelColor=504945&color=3c3836)](https://github.com/adam01110/overzicht)
   <br />
@@ -41,7 +41,6 @@ What I removed from upstream:
 - Matugen and Caelestia color-source handling.
 - Dynamic color template generation.
 - Glass mode and the related tint/border/shine settings.
-- Configurable rounding. This version is square by design.
 
 ## Usage
 
@@ -49,12 +48,6 @@ Run it directly:
 
 ```bash
 nix run github:adam01110/overzicht
-```
-
-Or build it from a checkout:
-
-```bash
-nix build .#overzicht
 ```
 
 The wrapper exposes Quickshell IPC:
@@ -160,5 +153,10 @@ Useful settings:
 - `overview.closeOnFocusLoss` closes the overlay after outside clicks or focus loss.
 - `overview.workspaceMap` lets different monitors start at different workspace offsets.
 - `overview.previewMode` can be `live` or event-driven values like `event` / `snapshot`.
+- `appearance.rounding.screenRounding` and `appearance.rounding.windowRounding` control overview corner radius. Set them to `0` for a square UI.
 - `windowPreview.showIcons` controls centered app icons on previews.
 - `windowPreview.cropToFill` controls whether full-screen previews crop into the tile.
+
+## Credits
+
+- [Original project (`Shanu-Kumawat/quickshell-overview`)](https://github.com/Shanu-Kumawat/quickshell-overview)

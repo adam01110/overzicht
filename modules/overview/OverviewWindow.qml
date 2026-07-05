@@ -66,6 +66,7 @@ Item { // Window
     property bool indicateXWayland: windowData?.xwayland ?? false
     property bool previewCaptureEnabled: true
     property bool initialized: false
+    readonly property real windowRounding: Math.max(0, Appearance.rounding.windowRounding * root.scale)
 
     x: initX
     y: initY
@@ -106,7 +107,7 @@ Item { // Window
     Rectangle {
         visible: (root.windowData?.monitor ?? -1) === root.widgetMonitorId
         anchors.fill: parent
-        radius: Appearance.rounding.windowRounding * root.scale
+        radius: root.windowRounding
         color: Appearance.colors.colLayer1
     }
 
@@ -122,10 +123,10 @@ Item { // Window
         height: root.cropToFill ? Math.max(parent.height, parent.width / srcAspect) : Math.min(parent.height, parent.width / srcAspect)
         captureSource: shouldCapturePreview ? root.toplevel : null
         live: livePreviewEnabled
-        layer.enabled: true
+        layer.enabled: root.windowRounding > 0
         layer.smooth: true
         layer.effect: MultiEffect {
-            maskEnabled: true
+            maskEnabled: root.windowRounding > 0
             maskSource: previewMask
             maskThresholdMin: 0.5
             maskSpreadAtMin: 1.0
@@ -134,7 +135,7 @@ Item { // Window
 
     Rectangle {
         anchors.fill: parent
-        radius: Appearance.rounding.windowRounding * root.scale
+        radius: root.windowRounding
         color: pressed ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Active, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Hover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.transparentize(Appearance.colors.colLayer2)
         border.color: ColorUtils.transparentize(Appearance.palette.outline, 0.7)
         border.width: 1
@@ -173,13 +174,13 @@ Item { // Window
         height: windowPreview.height
         anchors.centerIn: parent
         visible: false
-        layer.enabled: true
+        layer.enabled: root.windowRounding > 0
         layer.smooth: true
         Rectangle {
             anchors.centerIn: parent
             width: root.width
             height: root.height
-            radius: Appearance.rounding.windowRounding * root.scale
+            radius: root.windowRounding
         }
     }
 

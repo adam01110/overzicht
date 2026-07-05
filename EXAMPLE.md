@@ -41,6 +41,14 @@ Path: `~/.config/overzicht/settings.json`
         "elementMoveFast": 200
       }
     },
+    "rounding": {
+      // Radius for overview panel, workspace tiles, wallpaper masks, and active workspace indicator.
+      // Set to 0 for a fully square UI.
+      "screenRounding": 23,
+      // Radius for individual window preview masks and overlays.
+      // Set to 0 for square window previews.
+      "windowRounding": 18
+    },
     "sizes": {
       // Extra outer margin used to make room for the overview shadow/elevation effect.
       "elevationMargin": 10

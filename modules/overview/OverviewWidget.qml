@@ -41,6 +41,7 @@ Item {
     property real panelOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.panelOpacity))
     property real workspaceOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.workspaceOpacity))
     property real emptyWorkspaceWallpaperOverlayOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.emptyWorkspaceWallpaperOverlayOpacity))
+    readonly property real screenRounding: Math.max(0, Appearance.rounding.screenRounding * root.scale)
 
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
@@ -136,7 +137,7 @@ Item {
 
         implicitWidth: workspaceColumnLayout.implicitWidth + padding * 2
         implicitHeight: workspaceColumnLayout.implicitHeight + padding * 2
-        radius: 0
+        radius: root.screenRounding
         clip: true
         color: ColorUtils.applyAlpha(Appearance.colors.colLayer0, root.panelOpacity)
         border.width: 1
@@ -179,7 +180,7 @@ Item {
                             implicitHeight: root.workspaceImplicitHeight
                             clip: showWallpaper
                             color: showWallpaper ? "transparent" : ColorUtils.applyAlpha(hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor, root.workspaceOpacity)
-                            radius: 0
+                            radius: root.screenRounding
                             border.width: 2
                             border.color: hoveredWhileDragging ? hoveredBorderColor : "transparent"
 
@@ -193,10 +194,10 @@ Item {
                                 cache: true
                                 smooth: true
                                 mipmap: true
-                                layer.enabled: workspace.showWallpaper
+                                layer.enabled: workspace.showWallpaper && workspace.radius > 0
                                 layer.smooth: true
                                 layer.effect: MultiEffect {
-                                    maskEnabled: true
+                                    maskEnabled: workspace.radius > 0
                                     maskSource: workspaceWallpaperMask
                                     maskThresholdMin: 0.5
                                     maskSpreadAtMin: 1.0
@@ -207,7 +208,7 @@ Item {
                                 id: workspaceWallpaperMask
                                 anchors.fill: parent
                                 visible: false
-                                layer.enabled: true
+                                layer.enabled: workspace.radius > 0
                                 layer.smooth: true
                                 Rectangle {
                                     anchors.fill: parent
@@ -414,7 +415,7 @@ Item {
                 width: root.workspaceImplicitWidth
                 height: root.workspaceImplicitHeight
                 color: "transparent"
-                radius: 0
+                radius: root.screenRounding
                 border.width: 2
                 border.color: root.activeBorderColor
                 Behavior on x {
