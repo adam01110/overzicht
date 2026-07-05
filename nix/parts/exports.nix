@@ -1,7 +1,9 @@
-_: {
+{inputs, ...}: {
   flake = {
     overlays.default = final: _: {
-      overzicht = final.callPackage ../package.nix {};
+      overzicht = final.callPackage ../package.nix {
+        quickshell = inputs.quickshell.packages.${final.system}.default;
+      };
     };
 
     # keep-sorted start
@@ -14,13 +16,16 @@ _: {
     # keep-sorted start
     config,
     pkgs,
+    system,
     # keep-sorted end
     ...
   }: {
     packages = {
       # keep-sorted start
       default = config.packages.overzicht;
-      overzicht = pkgs.callPackage ../package.nix {};
+      overzicht = pkgs.callPackage ../package.nix {
+        quickshell = inputs.quickshell.packages.${system}.default;
+      };
       # keep-sorted end
     };
   };

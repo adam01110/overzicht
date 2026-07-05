@@ -201,7 +201,7 @@ Scope {
 
                 Loader {
                     id: overviewLoader
-                    active: Config?.options.overview.enable ?? true
+                    active: (Config?.options.overview.enable ?? true) && GlobalStates.overviewOpen
                     sourceComponent: OverviewWidget {
                         panelWindow: root
                         visible: true
@@ -214,14 +214,17 @@ Scope {
     IpcHandler {
         target: "overview"
 
-        function toggle() {
+        function toggle(): void {
             GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
         }
-        function close() {
+        function close(): void {
             GlobalStates.overviewOpen = false;
         }
-        function open() {
+        function open(): void {
             GlobalStates.overviewOpen = true;
+        }
+        function isOpen(): bool {
+            return GlobalStates.overviewOpen;
         }
     }
 }

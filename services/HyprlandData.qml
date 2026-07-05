@@ -13,25 +13,15 @@ import "../common"
 Singleton {
     id: root
     property var windowList: []
-    property var addresses: []
     property var windowByAddress: ({})
     property var workspaces: []
-    property var workspaceIds: []
     property var workspaceById: ({})
-    property var activeWorkspace: null
     property var monitors: []
-    property var layers: ({})
     property bool pendingWindowsUpdate: false
     property bool pendingMonitorsUpdate: false
-    property bool pendingLayersUpdate: false
     property bool pendingWorkspacesUpdate: false
-    property bool pendingActiveWorkspaceUpdate: false
     function updateWindowList() {
         getClients.running = true;
-    }
-
-    function updateLayers() {
-        getLayers.running = true;
     }
 
     function updateMonitors() {
@@ -40,19 +30,16 @@ Singleton {
 
     function updateWorkspaces() {
         getWorkspaces.running = true;
-        getActiveWorkspace.running = true;
     }
 
     function updateAll() {
-        scheduleUpdates(true, true, true, true, true);
+        scheduleUpdates(true, true, true);
     }
 
-    function scheduleUpdates(windows, monitors, layers, workspaces, activeWorkspace) {
+    function scheduleUpdates(windows, monitors, workspaces) {
         pendingWindowsUpdate = pendingWindowsUpdate || !!windows;
         pendingMonitorsUpdate = pendingMonitorsUpdate || !!monitors;
-        pendingLayersUpdate = pendingLayersUpdate || !!layers;
         pendingWorkspacesUpdate = pendingWorkspacesUpdate || !!workspaces;
-        pendingActiveWorkspaceUpdate = pendingActiveWorkspaceUpdate || !!activeWorkspace;
 
         const debounceMs = Math.max(0, Config.options.hacks.hyprlandEventDebounceMs);
         if (debounceMs === 0) {
@@ -72,17 +59,9 @@ Singleton {
             pendingMonitorsUpdate = false;
             updateMonitors();
         }
-        if (pendingLayersUpdate) {
-            pendingLayersUpdate = false;
-            updateLayers();
-        }
         if (pendingWorkspacesUpdate) {
             pendingWorkspacesUpdate = false;
             getWorkspaces.running = true;
-        }
-        if (pendingActiveWorkspaceUpdate) {
-            pendingActiveWorkspaceUpdate = false;
-            getActiveWorkspace.running = true;
         }
     }
 
@@ -96,7 +75,7 @@ Singleton {
     }
 
     Component.onCompleted: {
-        scheduleUpdates(true, true, true, true, true);
+        scheduleUpdates(true, true, true);
         flushPendingUpdates();
     }
 
@@ -109,21 +88,21 @@ Singleton {
                 return;
 
             if (eventName === "openwindow" || eventName === "closewindow" || eventName === "movewindow" || eventName === "movewindowv2" || eventName === "windowtitle") {
-                scheduleUpdates(true, false, false, true, false);
+                scheduleUpdates(true, false, true);
                 return;
             }
 
             if (eventName === "workspace" || eventName === "workspacev2" || eventName === "focusedmon" || eventName === "focusedmonv2" || eventName === "activewindow" || eventName === "activewindowv2") {
-                scheduleUpdates(false, false, false, true, true);
+                scheduleUpdates(false, false, true);
                 return;
             }
 
             if (eventName.startsWith("monitor") || eventName === "configreloaded") {
-                scheduleUpdates(true, true, false, true, true);
+                scheduleUpdates(true, true, true);
                 return;
             }
 
-            scheduleUpdates(true, true, true, true, true);
+            scheduleUpdates(true, true, true);
         }
     }
 
@@ -147,7 +126,6 @@ Singleton {
                     tempWinByAddress[win.address] = win;
                 }
                 root.windowByAddress = tempWinByAddress;
-                root.addresses = root.windowList.map(win => win.address);
             }
         }
     }
@@ -159,17 +137,6 @@ Singleton {
             id: monitorsCollector
             onStreamFinished: {
                 root.monitors = JSON.parse(monitorsCollector.text);
-            }
-        }
-    }
-
-    Process {
-        id: getLayers
-        command: ["hyprctl", "layers", "-j"]
-        stdout: StdioCollector {
-            id: layersCollector
-            onStreamFinished: {
-                root.layers = JSON.parse(layersCollector.text);
             }
         }
     }
@@ -187,18 +154,6 @@ Singleton {
                     tempWorkspaceById[ws.id] = ws;
                 }
                 root.workspaceById = tempWorkspaceById;
-                root.workspaceIds = root.workspaces.map(ws => ws.id);
-            }
-        }
-    }
-
-    Process {
-        id: getActiveWorkspace
-        command: ["hyprctl", "activeworkspace", "-j"]
-        stdout: StdioCollector {
-            id: activeWorkspaceCollector
-            onStreamFinished: {
-                root.activeWorkspace = JSON.parse(activeWorkspaceCollector.text);
             }
         }
     }

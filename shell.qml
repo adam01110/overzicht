@@ -1,5 +1,6 @@
 //@ pragma UseQApplication
 //@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
+//@ pragma ShellId overzicht
 
 import "./modules/overview/"
 import "./services/"

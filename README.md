@@ -132,6 +132,12 @@ overzicht ipc call overview open
 overzicht ipc call overview close
 ```
 
+When running directly from the flake, pass IPC arguments after `--`:
+
+```bash
+nix run .#overzicht -- ipc call overview toggle
+```
+
 Keyboard controls while the overview is open:
 
 - `Left` / `Right` / `Up` / `Down` move across the visible grid.
