@@ -1,21 +1,22 @@
 <div align="center">
-  <h1>Overzicht</h1>
 
-  <p>Standalone Quickshell workspace overview for Hyprland with live window previews, drag-and-drop moves, and Nix-first integration.</p>
+  # overzicht
 
-  [![CI](https://img.shields.io/github/actions/workflow/status/adam01110/overzicht/ci.yml?branch=main&style=flat-square&label=CI&labelColor=504945&color=cc241d)](https://github.com/adam01110/overzicht/actions/workflows/ci.yml)
+  A standalone Quickshell workspace overview for Hyprland.
+
   [![Repo Size](https://img.shields.io/github/repo-size/adam01110/overzicht?style=flat-square&label=repo%20size&labelColor=504945&color=3c3836)](https://github.com/adam01110/overzicht)
+  <br />
   [![Nix](https://img.shields.io/badge/Nix-flakes-689d6a?style=flat-square&labelColor=504945&logo=nixos&logoColor=ebdbb2)](https://nixos.wiki/wiki/Flakes)
   [![Hyprland](https://img.shields.io/badge/Hyprland-supported-458588?style=flat-square&labelColor=504945&color=458588)](https://hypr.land)
   [![Quickshell](https://img.shields.io/badge/Quickshell-QML-b16286?style=flat-square&labelColor=504945&color=b16286)](https://quickshell.outfoxxed.me/)
   [![Qt6](https://img.shields.io/badge/Qt-6-98971a?style=flat-square&labelColor=504945&logo=qt&logoColor=ebdbb2)](https://www.qt.io/)
-  [![Linux](https://img.shields.io/badge/platform-linux-fe8019?style=flat-square&labelColor=504945&color=fe8019)](https://kernel.org)
-  [![License](https://img.shields.io/badge/License-GPLv3-cc241d?style=flat-square&labelColor=504945&color=8ec07c)](./LICENSE)
 
-  [Overview](#overview) - [Features](#features) - [Removed From Upstream](#removed-from-upstream) - [Installation](#installation) - [Configuration](#configuration) - [Development](#development) - [Notes](#notes)
+  [Overview](#overview) - [Usage](#usage) - [Installation](#installation) - [Configuration](#configuration) - [Development](#development)
 </div>
 
-Overzicht is a full-screen workspace switcher built as a standalone Quickshell package. It renders the current workspace group as a grid, shows live or event-driven window previews, and talks to Hyprland directly for focus, workspace switching, and window moves.
+This fork keeps the parts I wanted from `quickshell-overview`, and removes the things i do not.
+
+It is built to fit with the rest of my Nix-based desktop tooling.
 
 <div align="center">
   <img src="./assets/screenshot.png" alt="Overzicht preview" width="640" />
@@ -23,69 +24,95 @@ Overzicht is a full-screen workspace switcher built as a standalone Quickshell p
 
 ## Overview
 
-- Standalone package entrypoint through `overzicht`, wrapping `quickshell -p ...`.
-- Full-screen overlay on every screen using `WlrLayershell.layer = Overlay` and namespace `overzicht`.
-- Keyboard-first control flow with IPC actions for opening, closing, and toggling the overview.
-- Nix flake outputs for package, overlay, Home Manager module, and NixOS module.
-- Runtime configuration loaded from JSON files under `~/.config/overzicht/`.
+`overzicht` opens a full-screen workspace switcher for Hyprland. It shows the current workspace group as a grid, draws window previews, and can switch workspaces, focus windows, close windows, or move windows through Hyprland IPC.
 
-## Features
+What it does:
 
-- Live workspace grid with scaled window previews sourced from Quickshell screencopy.
-- Click a workspace tile to switch to it.
-- Click a window preview to focus it.
-- Middle-click a window preview to close it.
-- Drag a window preview onto another workspace tile to move it there.
-- Keyboard navigation with arrow keys or `h/j/k/l`.
-- Optional auto-close on focus loss or outside click.
-- Optional reversed row and column ordering.
-- Optional per-monitor workspace offsets through `workspaceMap`.
-- Optional empty-row hiding within the active workspace group.
-- Optional backdrop and wallpaper-backed empty workspaces.
-- Event-driven preview refresh mode for lower capture churn.
+- Shows a grid of Hyprland workspaces with scaled window previews.
+- Opens as a full-screen overlay on every monitor.
+- Switches workspaces, focuses windows, closes windows, and moves windows through Hyprland IPC.
+- Supports mouse actions, drag-and-drop window moves, and keyboard navigation.
+- Reads simple JSON config from `~/.config/overzicht/`.
+- Ships as a Nix flake package, overlay, Home Manager module, and NixOS module.
+- Uses the Quickshell IPC target `overview` and layer-shell namespace `overzicht`.
 
-## Removed From Upstream
+What I removed from upstream:
 
-Compared to upstream `quickshell-overview`, this fork intentionally removes:
+- Matugen and Caelestia color-source handling.
+- Dynamic color template generation.
+- Glass mode and the related tint/border/shine settings.
+- Configurable rounding. This version is square by design.
 
-- Matugen-driven dynamic color generation and the `Appearance.colors.qml` template flow.
-- Caelestia color-source selection and live theme refresh.
-- Configurable rounding options; overview surfaces are square-only here.
-- Glass-mode styling and its related tint, border, and shine settings.
+## Usage
 
-## Installation
-
-Nix is the only supported installation path.
-
-### Flake package
-
-Run directly from a flake input or this repository:
+Run it directly:
 
 ```bash
 nix run github:adam01110/overzicht
 ```
 
-Build the package:
+Or build it from a checkout:
 
 ```bash
 nix build .#overzicht
 ```
 
+The wrapper exposes Quickshell IPC:
+
+```bash
+# Toggle the overview
+overzicht ipc call overview toggle
+
+# Open it
+overzicht ipc call overview open
+
+# Close it
+overzicht ipc call overview close
+```
+
+When running from the flake directly, pass IPC arguments after `--`:
+
+```bash
+nix run .#overzicht -- ipc call overview toggle
+```
+
+Keyboard controls while the overview is open:
+
+| Key | Action |
+| --- | --- |
+| `Left` / `Right` / `Up` / `Down` | Move across the grid |
+| `h` / `j` / `k` / `l` | Vim-style grid movement |
+| `1` to `9` | Jump to that workspace position |
+| `0` | Jump to position 10 when available |
+| `Return` | Close the overview |
+| `Escape` | Close the overview |
+
+Mouse controls:
+
+- Click a workspace to switch to it.
+- Click a window preview to focus it.
+- Middle-click a window preview to close it.
+- Drag a window preview onto another workspace to move it there.
+
+## Installation
+
+Nix is the only supported installation path.
+
 Available flake outputs:
 
-- `packages.<system>.overzicht`
-- `packages.<system>.default`
-- `overlays.default`
-- `homeModules.default`
-- `nixosModules.default`
+| Output | Purpose |
+| --- | --- |
+| `packages.<system>.overzicht` | Main package |
+| `packages.<system>.default` | Same package as the default output |
+| `overlays.default` | Nixpkgs overlay |
+| `homeModules.default` | Home Manager module |
+| `nixosModules.default` | NixOS module |
 
 ### Home Manager
 
-Import the module and enable `programs.overzicht`:
-
 ```nix
 {
-  imports = [inputs.overzicht.homeModules.default];
+  imports = [ inputs.overzicht.homeModules.default ];
 
   programs.overzicht = {
     enable = true;
@@ -105,106 +132,33 @@ Import the module and enable `programs.overzicht`:
 }
 ```
 
-### NixOS module
-
-Import the module and enable `services.overzicht`:
+### NixOS
 
 ```nix
 {
-  imports = [inputs.overzicht.nixosModules.default];
+  imports = [ inputs.overzicht.nixosModules.default ];
 
   services.overzicht.enable = true;
 }
 ```
 
-## Usage
-
-IPC target: `overview`
-
-```bash
-# Toggle the overview
-overzicht ipc call overview toggle
-
-# Open the overview
-overzicht ipc call overview open
-
-# Close the overview
-overzicht ipc call overview close
-```
-
-When running directly from the flake, pass IPC arguments after `--`:
-
-```bash
-nix run .#overzicht -- ipc call overview toggle
-```
-
-Keyboard controls while the overview is open:
-
-- `Left` / `Right` / `Up` / `Down` move across the visible grid.
-- `h` / `j` / `k` / `l` mirror directional movement.
-- `1` to `9` jump to the matching workspace position in the current group.
-- `0` jumps to position 10 when the grid has at least ten cells.
-- `Return` and `Escape` close the overlay.
-- Clicking outside the overview closes it when `overview.closeOnFocusLoss` is enabled.
-
 ## Configuration
 
-Overzicht reads two runtime files:
+Config lives here:
 
-- `~/.config/overzicht/settings.json`
-- `~/.config/overzicht/colors.json`
+| File | Purpose |
+| --- | --- |
+| `~/.config/overzicht/settings.json` | Layout, previews, behavior, animation timings |
+| `~/.config/overzicht/colors.json` | Palette consumed by `common/Appearance.qml` |
 
-The Home Manager module can generate both files for you. Complete examples and the full option reference live in [`EXAMPLE.md`](./EXAMPLE.md).
+The Home Manager module can generate both files. Full examples are in [`EXAMPLE.md`](./EXAMPLE.md).
 
-### `settings.json`
+Useful settings:
 
-`settings.json` controls layout, motion, previews, and runtime behavior.
-
-Main groups:
-
-- `appearance`
-- `overview`
-- `windowPreview`
-- `hacks`
-
-Useful `overview` toggles include:
-
-- `hideEmptyRows` to collapse unused workspace rows in the current group.
-- `closeOnFocusLoss` to dismiss the overview on outside click or focus-grab loss. Defaults to `true`.
-- `useWorkspaceMap` and `workspaceMap` for per-monitor workspace offsets.
-
-Useful `windowPreview` toggles include:
-
-- `showIcons` to show or hide application icons centered over window previews. Defaults to `true`.
-- `cropToFill` to crop full-screen previews to fill the workspace tile when `true`; defaults to `false` so the full preview remains visible with possible padding bars.
-
-> [!TIP]
-> `previewMode` accepts `live` and event-driven values such as `event` or `snapshot`. For the full schema and examples, use [`EXAMPLE.md`](./EXAMPLE.md).
-
-### `colors.json`
-
-`colors.json` provides the palette consumed by `common/Appearance.qml`. Define your gruvbox or custom palette there, and use [`EXAMPLE.md`](./EXAMPLE.md) for the full key list.
-
-## Development
-
-```bash
-# Inspect outputs
-nix flake show
-
-# Enter the dev shell
-nix develop
-
-# Format the repository
-nix fmt
-
-# Build the package
-nix build .#overzicht
-```
-
-Formatting is configured through `treefmt`.
-
-## Notes
-
-- `WlrLayershell.namespace` is `overzicht`.
-- The package is designed for Hyprland and depends on Quickshell Hyprland integration.
-- There is no manual non-Nix installer and no AUR package.
+- `overview.rows` and `overview.columns` set the workspace grid shape.
+- `overview.hideEmptyRows` keeps the grid compact when a row has no windows.
+- `overview.closeOnFocusLoss` closes the overlay after outside clicks or focus loss.
+- `overview.workspaceMap` lets different monitors start at different workspace offsets.
+- `overview.previewMode` can be `live` or event-driven values like `event` / `snapshot`.
+- `windowPreview.showIcons` controls centered app icons on previews.
+- `windowPreview.cropToFill` controls whether full-screen previews crop into the tile.

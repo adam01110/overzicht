@@ -1,6 +1,6 @@
 # Configuration Examples
 
-Complete examples for the two runtime JSON files generated/used by Overzicht.
+Examples for the two runtime JSON files generated/used by Overzicht.
 
 ## settings.json
 
