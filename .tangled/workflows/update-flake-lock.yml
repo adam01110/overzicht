@@ -1,0 +1,25 @@
+when:
+  - event: ["manual"]
+engine: "nixery"
+dependencies:
+  nixpkgs:
+    - git
+    - nix
+steps:
+  - name: "Update flake.lock"
+    command: |
+      set -euo pipefail
+
+      git config user.name "spindle"
+      git config user.email "spindle@zezura.xyz"
+
+      nix flake update
+
+      if git diff --quiet -- flake.lock; then
+        echo "flake.lock is already up to date"
+        exit 0
+      fi
+
+      git add flake.lock
+      git commit -m "flake.lock: update"
+      git push origin "HEAD:${TANGLED_REPO_DEFAULT_BRANCH:-main}"
