@@ -27,7 +27,12 @@ Singleton {
     }
 
     function updateAll() {
-        scheduleUpdates(true, true);
+        if (!GlobalStates.overviewOpen)
+            return;
+
+        pendingWindowsUpdate = true;
+        pendingMonitorsUpdate = true;
+        flushPendingUpdates();
     }
 
     function scheduleUpdates(windows, monitors) {
@@ -67,10 +72,8 @@ Singleton {
     }
 
     Component.onCompleted: {
-        if (GlobalStates.overviewOpen) {
+        if (GlobalStates.overviewOpen)
             root.updateAll();
-            root.flushPendingUpdates();
-        }
     }
 
     Connections {
@@ -79,7 +82,6 @@ Singleton {
         function onOverviewOpenChanged() {
             if (GlobalStates.overviewOpen) {
                 root.updateAll();
-                root.flushPendingUpdates();
             } else {
                 eventDebounceTimer.stop();
                 root.pendingWindowsUpdate = false;

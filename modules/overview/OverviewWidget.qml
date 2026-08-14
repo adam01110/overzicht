@@ -379,10 +379,16 @@ Item {
                         onReleased: {
                             const targetWorkspace = root.draggingTargetWorkspace;
                             const address = window.windowData?.address;
-                            const dropX = window.x + window.Drag.hotSpot.x;
-                            const dropY = window.y + window.Drag.hotSpot.y;
-                            const cursorPosition = windowSpace.mapToGlobal(dropX, dropY);
-                            const swapTarget = !windowData?.floating ? root.dropSwapTarget(targetWorkspace, dropX, dropY, address) : "";
+                            let swapTarget = "";
+                            let cursorPosition = null;
+                            if (targetWorkspace !== -1) {
+                                const dropX = window.x + window.Drag.hotSpot.x;
+                                const dropY = window.y + window.Drag.hotSpot.y;
+                                swapTarget = !windowData?.floating ? root.dropSwapTarget(targetWorkspace, dropX, dropY, address) : "";
+                                if (swapTarget)
+                                    cursorPosition = windowSpace.mapToGlobal(dropX, dropY);
+                            }
+
                             window.pressed = false;
                             window.Drag.active = false;
                             root.draggingFromWorkspace = -1;
