@@ -78,7 +78,7 @@ Item { // Window
         const isFullscreen = (windowData?.fullscreen ?? 0) > 0;
         if (isFullscreen || thisWsId === undefined)
             return true;
-        return !HyprlandData.windowList.some(w => w.workspace?.id === thisWsId && (w.fullscreen ?? 0) > 0);
+        return !HyprlandData.fullscreenWorkspaces[thisWsId];
     }
 
     clip: true
@@ -122,7 +122,7 @@ Item { // Window
         width: root.cropToFill ? Math.max(parent.width, parent.height * srcAspect) : Math.min(parent.width, parent.height * srcAspect)
         height: root.cropToFill ? Math.max(parent.height, parent.width / srcAspect) : Math.min(parent.height, parent.width / srcAspect)
         captureSource: shouldCapturePreview ? root.toplevel : null
-        live: livePreviewEnabled
+        live: livePreviewEnabled && shouldCapturePreview
         layer.enabled: root.windowRounding > 0
         layer.smooth: true
         layer.effect: MultiEffect {
