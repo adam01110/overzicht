@@ -14,15 +14,13 @@
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell?ref=refs/tags/v0.3.0";
     };
 
-    systems.url = "github:nix-systems/default";
-
     treefmt-nix.url = "github:numtide/treefmt-nix";
     # keep-sorted end
   };
 
   outputs = inputs @ {flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = import inputs.systems;
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
       imports = with inputs; [(import-tree ./nix/parts)];
     };
 }
