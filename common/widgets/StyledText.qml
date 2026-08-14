@@ -12,5 +12,5 @@ Text {
         family: Appearance?.font.family.main ?? "sans-serif"
         pixelSize: Appearance?.font.pixelSize.small ?? 15
     }
-    color: Appearance?.palette.onBackground ?? "white"
+    color: Appearance?.colors.panelText ?? "white"
 }

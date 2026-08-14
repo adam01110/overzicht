@@ -26,7 +26,7 @@ Item {
     property var windowByAddress: HyprlandData.windowByAddress
     property var monitorData: HyprlandData.monitors.find(m => m.id === root.monitor?.id)
     property real scale: Config.options.overview.scale
-    property color activeBorderColor: Appearance.colors.colSecondary
+    property color activeBorderColor: Appearance.colors.accent
 
     property real workspaceImplicitWidth: Math.round((monitorData?.transform % 2 === 1) ? ((monitor.height / monitor.scale - (monitorData?.reserved?.[0] ?? 0) - (monitorData?.reserved?.[2] ?? 0)) * root.scale) : ((monitor.width / monitor.scale - (monitorData?.reserved?.[0] ?? 0) - (monitorData?.reserved?.[2] ?? 0)) * root.scale))
     property real workspaceImplicitHeight: Math.round((monitorData?.transform % 2 === 1) ? ((monitor.width / monitor.scale - (monitorData?.reserved?.[1] ?? 0) - (monitorData?.reserved?.[3] ?? 0)) * root.scale) : ((monitor.height / monitor.scale - (monitorData?.reserved?.[1] ?? 0) - (monitorData?.reserved?.[3] ?? 0)) * root.scale))
@@ -184,9 +184,9 @@ Item {
         implicitHeight: workspaceColumnLayout.implicitHeight + padding * 2
         radius: root.screenRounding
         clip: true
-        color: ColorUtils.applyAlpha(Appearance.colors.colLayer0, root.panelOpacity)
+        color: ColorUtils.applyAlpha(Appearance.colors.panel, root.panelOpacity)
         border.width: 1
-        border.color: ColorUtils.applyAlpha(Appearance.colors.colLayer0Border, root.panelOpacity)
+        border.color: ColorUtils.applyAlpha(Appearance.colors.panelBorder, root.panelOpacity)
 
         MouseArea {
             anchors.fill: parent
@@ -215,10 +215,18 @@ Item {
                             id: workspace
                             property int colIndex: index
                             property int workspaceValue: root.getWorkspaceInCell(rowIndex, colIndex)
+                            readonly property bool hasWindows: {
+                                const windows = root.windowByAddress;
+                                for (const address in windows) {
+                                    if (windows[address]?.workspace?.id === workspaceValue)
+                                        return true;
+                                }
+                                return false;
+                            }
                             property bool showWallpaper: root.hasEmptyWorkspaceWallpaper
-                            property color defaultWorkspaceColor: Appearance.colors.colLayer1
-                            property color hoveredWorkspaceColor: ColorUtils.mix(defaultWorkspaceColor, Appearance.colors.colLayer1Hover, 0.1)
-                            property color hoveredBorderColor: Appearance.colors.colLayer2Hover
+                            property color defaultWorkspaceColor: Appearance.colors.workspace
+                            property color hoveredWorkspaceColor: ColorUtils.mix(defaultWorkspaceColor, Appearance.colors.workspaceHover, 0.1)
+                            property color hoveredBorderColor: Appearance.colors.windowHover
                             property bool hoveredWhileDragging: false
 
                             implicitWidth: root.workspaceImplicitWidth
@@ -226,8 +234,7 @@ Item {
                             clip: showWallpaper
                             color: showWallpaper ? "transparent" : ColorUtils.applyAlpha(hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor, root.workspaceOpacity)
                             radius: root.screenRounding
-                            border.width: 2
-                            border.color: hoveredWhileDragging ? hoveredBorderColor : "transparent"
+                            border.width: 0
 
                             Image {
                                 id: workspaceWallpaper
@@ -277,7 +284,7 @@ Item {
                                     weight: Font.DemiBold
                                     family: Appearance.font.family.expressive
                                 }
-                                color: ColorUtils.transparentize(Appearance.colors.colOnLayer1, 0.8)
+                                color: ColorUtils.transparentize(Appearance.colors.workspaceText, 0.8)
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -307,6 +314,15 @@ Item {
                                     if (root.draggingTargetWorkspace == workspaceValue)
                                         root.draggingTargetWorkspace = -1;
                                 }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                visible: workspace.hoveredWhileDragging || !workspace.hasWindows
+                                color: "transparent"
+                                radius: workspace.radius
+                                border.width: workspace.hoveredWhileDragging ? 2 : 1
+                                border.color: workspace.hoveredWhileDragging ? workspace.hoveredBorderColor : Appearance.colors.panelBorder
                             }
                         }
                     }

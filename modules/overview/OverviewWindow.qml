@@ -108,7 +108,7 @@ Item { // Window
         visible: (root.windowData?.monitor ?? -1) === root.widgetMonitorId
         anchors.fill: parent
         radius: root.windowRounding
-        color: Appearance.colors.colLayer1
+        color: Appearance.colors.workspace
     }
 
     ScreencopyView {
@@ -136,8 +136,8 @@ Item { // Window
     Rectangle {
         anchors.fill: parent
         radius: root.windowRounding
-        color: pressed ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Active, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.colLayer2Hover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.transparentize(Appearance.colors.colLayer2)
-        border.color: ColorUtils.transparentize(Appearance.palette.outline, 0.7)
+        color: pressed ? ColorUtils.applyAlpha(Appearance.colors.windowActive, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.windowHover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.transparentize(Appearance.colors.window)
+        border.color: Appearance.colors.windowBorder
         border.width: 1
 
         ColumnLayout {

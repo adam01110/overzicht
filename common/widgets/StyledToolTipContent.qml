@@ -23,10 +23,10 @@ Item {
             bottom: root.bottom
             horizontalCenter: root.horizontalCenter
         }
-        color: Appearance?.colors.colTooltip
+        color: Appearance?.colors.tooltip
         radius: Appearance?.rounding.verysmall
         border.width: 1
-        border.color: ColorUtils.transparentize(Appearance?.palette.outline, 0.7)
+        border.color: Appearance?.colors.tooltipBorder
         opacity: shown ? 1 : 0
         implicitWidth: shown || !root.collapseWhenHidden ? (tooltipTextObject.implicitWidth + 2 * root.horizontalPadding) : 0
         implicitHeight: shown || !root.collapseWhenHidden ? (tooltipTextObject.implicitHeight + 2 * root.verticalPadding) : 0
@@ -55,7 +55,7 @@ Item {
             text: root.text
             font.pixelSize: Appearance?.font.pixelSize.smaller ?? 14
             font.hintingPreference: Font.PreferNoHinting
-            color: Appearance?.colors.colOnTooltip ?? "#FFFFFF"
+            color: Appearance?.colors.tooltipText ?? "#FFFFFF"
             wrapMode: Text.Wrap
         }
     }

@@ -149,51 +149,25 @@ Path: `~/.config/overzicht/colors.json`
 
 ```jsonc
 {
-  // Primary accent color, exposed as Appearance.colors.colPrimary for accent usage.
-  "primary": "#fb4934",
-  // Text/icon color intended to sit on top of primary surfaces.
-  "onPrimary": "#282828",
-  // Container variant of the primary accent color.
-  "primaryContainer": "#3c3836",
-  // Text/icon color intended to sit on top of primaryContainer surfaces.
-  "onPrimaryContainer": "#fbf1c7",
-  // Text/icon color intended to sit on top of secondary-colored surfaces.
-  "onSecondary": "#282828",
-  // Secondary container color, exposed as Appearance.colors.colSecondaryContainer.
-  "secondaryContainer": "#3c3836",
-  // Text/icon color intended to sit on top of secondaryContainer surfaces.
-  "onSecondaryContainer": "#fbf1c7",
-  // Default foreground color for generic text, including StyledText.
-  "onBackground": "#ebdbb2",
-  // Base surface tone; defined for theme completeness but not directly consumed by current overview widgets.
-  "surface": "#282828",
-  // Higher-emphasis surface tone; currently defined but not directly consumed by current overview widgets.
-  "surfaceContainerHigh": "#3c3836",
-  // Highest-emphasis surface tone; currently defined but not directly consumed by current overview widgets.
-  "surfaceContainerHighest": "#504945",
-  // Surface variant tone; currently defined but not directly consumed by current overview widgets.
-  "surfaceVariant": "#504945",
-  // Main panel/background color used for the overview container.
-  "background": "#3c3836",
-  // Secondary accent color used for the active workspace border.
-  "secondary": "#b8bb26",
-  // Workspace tile background color.
-  "surfaceContainerLow": "#282828",
-  // Window preview overlay base color.
-  "surfaceContainer": "#b8bb26",
-  // Foreground color for content placed on surfaceContainer surfaces.
-  "onSurface": "#282828",
-  // Foreground color used for workspace numbers and other content on low-emphasis surfaces.
-  "onSurfaceVariant": "#fbf1c7",
-  // Tooltip background color via Appearance.colors.colTooltip.
-  "inverseSurface": "#504945",
-  // Tooltip text color via Appearance.colors.colOnTooltip.
-  "inverseOnSurface": "#fbf1c7",
-  // Outline color used directly on preview borders and indirectly for subtext/outline roles.
+  // Active workspace accent.
+  "accent": "#b8bb26",
+  // Subtle border source mixed with the panel color.
+  "border": "#665c54",
+  // Window preview border source.
   "outline": "#fbf1c7",
-  // Variant outline color mixed into the overview panel border.
-  "outlineVariant": "#665c54",
-  // Shadow source color used for the overview drop shadow.
-  "shadow": "#282828"
+  // Overview panel background and default text.
+  "panel": "#3c3836",
+  "panelText": "#ebdbb2",
+  // Drop-shadow source color.
+  "shadow": "#282828",
+  // Tooltip background and text. The border derives from tooltipText.
+  "tooltip": "#504945",
+  "tooltipText": "#fbf1c7",
+  // Window overlay background and interaction-state foreground.
+  "window": "#b8bb26",
+  "windowText": "#282828",
+  // Workspace tile background and number color.
+  "workspace": "#282828",
+  "workspaceText": "#fbf1c7"
 }
 ```
