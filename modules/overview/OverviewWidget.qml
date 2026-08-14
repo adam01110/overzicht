@@ -120,6 +120,24 @@ Item {
         return mappedIndex === -1 ? rowIndex : mappedIndex;
     }
 
+    function dropSwapTarget(workspaceId, dropX, dropY, excludedAddress) {
+        for (let i = windowRepeater.count - 1; i >= 0; --i) {
+            const candidate = windowRepeater.itemAt(i);
+            const data = candidate?.windowData;
+            if (!data || data.address === excludedAddress || data.workspace?.id !== workspaceId || data.floating || data.fullscreen > 0)
+                continue;
+            if (dropX >= candidate.x && dropX <= candidate.x + candidate.width && dropY >= candidate.y && dropY <= candidate.y + candidate.height)
+                return data.address;
+        }
+
+        return "";
+    }
+
+    function refreshWindowCaptures() {
+        for (let i = 0; i < windowRepeater.count; ++i)
+            windowRepeater.itemAt(i)?.refreshCapture();
+    }
+
     implicitWidth: overviewBackground.implicitWidth + Appearance.sizes.elevationMargin * 2
     implicitHeight: overviewBackground.implicitHeight + Appearance.sizes.elevationMargin * 2
 
@@ -279,6 +297,7 @@ Item {
             implicitHeight: workspaceColumnLayout.implicitHeight
 
             Repeater {
+                id: windowRepeater
                 model: ScriptModel {
                     values: {
                         return ToplevelManager.toplevels.values.filter(toplevel => {
@@ -362,15 +381,36 @@ Item {
                         }
                         onReleased: {
                             const targetWorkspace = root.draggingTargetWorkspace;
+                            const address = window.windowData?.address;
+                            const dropX = window.x + window.Drag.hotSpot.x;
+                            const dropY = window.y + window.Drag.hotSpot.y;
+                            const cursorPosition = windowSpace.mapToGlobal(dropX, dropY);
+                            const swapTarget = !windowData?.floating ? root.dropSwapTarget(targetWorkspace, dropX, dropY, address) : "";
                             window.pressed = false;
                             window.Drag.active = false;
                             root.draggingFromWorkspace = -1;
-                            if (targetWorkspace !== -1 && targetWorkspace !== windowData?.workspace.id) {
-                                if (Hyprland.usingLua)
-                                    Hyprland.dispatch(`hl.dsp.window.move({workspace = '${targetWorkspace}', follow = false, window = 'address:${window.windowData?.address}'})`);
-                                else
-                                    Hyprland.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${window.windowData?.address}`);
-                                updateWindowPosition.restart();
+                            root.draggingTargetWorkspace = -1;
+                            if (targetWorkspace !== -1) {
+                                const changingWorkspace = targetWorkspace !== windowData?.workspace.id;
+                                if (Hyprland.usingLua) {
+                                    if (changingWorkspace)
+                                        Hyprland.dispatch(`hl.dsp.window.move({workspace = '${targetWorkspace}', follow = false, window = 'address:${address}'})`);
+                                    if (swapTarget) {
+                                        Hyprland.dispatch(`hl.dsp.window.swap({target = 'address:${swapTarget}', window = 'address:${address}'})`);
+                                        Hyprland.dispatch(`hl.dsp.cursor.move({x = ${Math.round(cursorPosition.x)}, y = ${Math.round(cursorPosition.y)}})`);
+                                    }
+                                } else if (changingWorkspace) {
+                                    Hyprland.dispatch(`movetoworkspacesilent ${targetWorkspace}, address:${address}`);
+                                }
+
+                                if (changingWorkspace || swapTarget) {
+                                    HyprlandData.updateWindowList();
+                                    root.refreshWindowCaptures();
+                                    updateWindowPosition.restart();
+                                } else {
+                                    window.x = window.initX;
+                                    window.y = window.initY;
+                                }
                             } else {
                                 window.x = window.initX;
                                 window.y = window.initY;
