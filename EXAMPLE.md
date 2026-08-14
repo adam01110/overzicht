@@ -118,7 +118,21 @@ Path: `~/.config/overzicht/settings.json`
     // Opacity applied to preview windows that belong to a different monitor than the current overview panel.
     "inactiveMonitorOpacity": 0.4,
     // Crop full-screen previews to fill the workspace tile. When false, the full preview remains visible with possible padding bars.
-    "cropToFill": false
+    "cropToFill": false,
+    // Keep one tooltip visible and animate it between hovered windows. Set false to use the original per-window popup behavior.
+    "smoothTooltipMovement": true,
+    "tooltipAnimations": {
+      "expandCollapse": {
+        // Animate tooltip expansion when shown and collapse when hidden.
+        "enable": true
+      },
+      "fade": {
+        // Fade tooltips in and out.
+        "enable": true,
+        // Duration of the fade animation in milliseconds.
+        "duration": 200
+      }
+    }
   },
   "hacks": {
     // Small delay used before focus grabs and some window-position recalculations to avoid timing issues.

@@ -158,6 +158,9 @@ Useful settings:
 - `appearance.rounding.screenRounding` and `appearance.rounding.windowRounding` control overview corner radius. Set them to `0` for a square UI.
 - `windowPreview.showIcons` controls centered app icons on previews.
 - `windowPreview.cropToFill` controls whether full-screen previews crop into the tile.
+- `windowPreview.smoothTooltipMovement` animates the bordered tooltip between hovered windows; set it to `false` for the original per-window popups.
+- `windowPreview.tooltipAnimations.expandCollapse.enable` controls tooltip expansion and collapse.
+- `windowPreview.tooltipAnimations.fade` controls tooltip fading with `enable` and `duration`.
 
 ## Credits
 

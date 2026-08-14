@@ -46,7 +46,34 @@ Item {
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
     property bool hideEmptyRows: Config.options.overview.hideEmptyRows
+    property bool smoothTooltipMovement: Config.options.windowPreview.smoothTooltipMovement
+    property bool tooltipExpandCollapseAnimationEnabled: Config.options.windowPreview.tooltipAnimations.expandCollapse.enable
+    property bool tooltipFadeAnimationEnabled: Config.options.windowPreview.tooltipAnimations.fade.enable
+    property int tooltipFadeAnimationDuration: Math.max(0, Config.options.windowPreview.tooltipAnimations.fade.duration)
     readonly property bool hasEmptyWorkspaceWallpaper: `${emptyWorkspaceWallpaperPath ?? ""}`.trim().length > 0
+    onSmoothTooltipMovementChanged: {
+        tooltipHideTimer.stop();
+        sharedWindowTooltip.targetWindow = null;
+    }
+
+    function windowTooltipText(window) {
+        const data = window?.windowData;
+        return `${data?.title ?? "Unknown"}\n[${data?.class ?? "unknown"}] ${data?.xwayland ? "[XWayland] " : ""}`;
+    }
+
+    function showWindowTooltip(window) {
+        if (!root.smoothTooltipMovement)
+            return;
+
+        tooltipHideTimer.stop();
+        sharedWindowTooltip.tooltipText = root.windowTooltipText(window);
+        sharedWindowTooltip.targetWindow = window;
+    }
+
+    function hideWindowTooltip(window) {
+        if (root.smoothTooltipMovement && sharedWindowTooltip.targetWindow === window)
+            tooltipHideTimer.restart();
+    }
 
     function getWorkspaceRow(workspaceId) {
         if (!Number.isFinite(workspaceId))
@@ -364,8 +391,14 @@ Item {
                         id: dragArea
                         anchors.fill: parent
                         hoverEnabled: true
-                        onEntered: hovered = true
-                        onExited: hovered = false
+                        onEntered: {
+                            hovered = true;
+                            root.showWindowTooltip(window);
+                        }
+                        onExited: {
+                            hovered = false;
+                            root.hideWindowTooltip(window);
+                        }
                         acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                         drag.target: parent
                         onPressed: mouse => {
@@ -431,8 +464,11 @@ Item {
 
                         StyledToolTip {
                             extraVisibleCondition: false
-                            alternativeVisibleCondition: dragArea.containsMouse && !window.Drag.active
-                            text: `${windowData?.title ?? "Unknown"}\n[${windowData?.class ?? "unknown"}] ${windowData?.xwayland ? "[XWayland] " : ""}`
+                            alternativeVisibleCondition: !root.smoothTooltipMovement && dragArea.containsMouse && !window.Drag.active
+                            text: root.windowTooltipText(window)
+                            expandCollapseAnimationEnabled: root.tooltipExpandCollapseAnimationEnabled
+                            fadeAnimationEnabled: root.tooltipFadeAnimationEnabled
+                            fadeAnimationDuration: root.tooltipFadeAnimationDuration
                         }
                     }
                 }
@@ -458,6 +494,56 @@ Item {
                     animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
                 }
             }
+        }
+    }
+
+    Timer {
+        id: tooltipHideTimer
+        interval: Appearance.animation.elementMoveFast.duration
+        repeat: false
+        onTriggered: sharedWindowTooltip.targetWindow = null
+    }
+
+    StyledToolTipContent {
+        id: sharedWindowTooltip
+        property var targetWindow: null
+        property bool hasPosition: false
+        property string tooltipText: ""
+        property real tooltipX: 0
+        property real tooltipY: 0
+        readonly property real edgeMargin: Appearance.sizes.elevationMargin
+
+        x: tooltipX
+        y: tooltipY
+        z: root.windowDraggingZ + 1
+        width: implicitWidth
+        height: implicitHeight
+        text: tooltipText
+        shown: root.smoothTooltipMovement && targetWindow !== null && !targetWindow.Drag.active
+        collapseWhenHidden: true
+        expandCollapseAnimationEnabled: root.tooltipExpandCollapseAnimationEnabled
+        fadeAnimationEnabled: root.tooltipFadeAnimationEnabled
+        fadeAnimationDuration: root.tooltipFadeAnimationDuration
+
+        onTargetWindowChanged: {
+            if (targetWindow) {
+                const targetTop = targetWindow.mapToItem(root, targetWindow.width / 2, 0);
+                tooltipX = Math.max(edgeMargin, Math.min(root.width - width - edgeMargin, targetTop.x - width / 2));
+                tooltipY = targetTop.y - height - edgeMargin;
+                if (!hasPosition)
+                    Qt.callLater(() => sharedWindowTooltip.hasPosition = true);
+            } else {
+                hasPosition = false;
+            }
+        }
+
+        Behavior on x {
+            enabled: sharedWindowTooltip.hasPosition
+            animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
+        }
+        Behavior on y {
+            enabled: sharedWindowTooltip.hasPosition
+            animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
         }
     }
 }

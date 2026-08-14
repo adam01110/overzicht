@@ -132,6 +132,16 @@ Singleton {
             property real xwaylandIndicatorToIconRatio: root.optionValue(["windowPreview", "xwaylandIndicatorToIconRatio"], 0.35)
             property real inactiveMonitorOpacity: root.optionValue(["windowPreview", "inactiveMonitorOpacity"], 0.4)
             property bool cropToFill: root.optionValue(["windowPreview", "cropToFill"], false)
+            property bool smoothTooltipMovement: root.optionValue(["windowPreview", "smoothTooltipMovement"], true)
+            property QtObject tooltipAnimations: QtObject {
+                property QtObject expandCollapse: QtObject {
+                    property bool enable: root.optionValue(["windowPreview", "tooltipAnimations", "expandCollapse", "enable"], true)
+                }
+                property QtObject fade: QtObject {
+                    property bool enable: root.optionValue(["windowPreview", "tooltipAnimations", "fade", "enable"], true)
+                    property int duration: root.optionValue(["windowPreview", "tooltipAnimations", "fade", "duration"], 200)
+                }
+            }
         }
 
         property QtObject hacks: QtObject {
