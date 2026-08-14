@@ -36,6 +36,8 @@ What it does:
 - Ships as a Nix flake package, overlay, Home Manager module, and NixOS module.
 - Uses the Quickshell IPC target `overview` and layer-shell namespace `overzicht`.
 
+A Hyprland release with Lua dispatcher support (`hl.dsp`) is required.
+
 What I removed from upstream:
 
 - Matugen and Caelestia color-source handling.

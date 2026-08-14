@@ -184,10 +184,7 @@ Scope {
 
                     if (targetId !== null) {
                         const clampedTarget = Math.max(minWorkspaceId, Math.min(maxWorkspaceId, targetId));
-                        if (Hyprland.usingLua)
-                            Hyprland.dispatch(`hl.dsp.focus({workspace = '${clampedTarget}'})`);
-                        else
-                            Hyprland.dispatch("workspace " + clampedTarget);
+                        Hyprland.dispatch(`hl.dsp.focus({workspace = '${clampedTarget}'})`);
                         event.accepted = true;
                     }
                 }
