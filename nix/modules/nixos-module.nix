@@ -47,7 +47,7 @@ in {
     systemd.user.services.overzicht = {
       description = "overzicht";
       wantedBy = [cfg.target];
-      after = ["graphical-session-pre.target"];
+      after = [cfg.target];
       partOf = [cfg.target];
 
       serviceConfig = {

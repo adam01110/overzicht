@@ -70,7 +70,7 @@ in {
     systemd.user.services.overzicht = mkIf cfg.systemd.enable {
       Unit = {
         Description = "overzicht";
-        After = ["graphical-session-pre.target"];
+        After = ["graphical-session.target"];
         PartOf = ["graphical-session.target"];
       };
 
