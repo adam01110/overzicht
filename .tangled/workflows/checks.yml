@@ -5,7 +5,7 @@ when:
     branch: ["main"]
 engine: "nixery"
 dependencies:
-  nixpkgs:
+  nixpkgs/nixpkgs-unstable:
     - nix
 steps:
   - name: "Run checks"

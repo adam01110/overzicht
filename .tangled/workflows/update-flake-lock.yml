@@ -2,7 +2,7 @@ when:
   - event: ["manual"]
 engine: "nixery"
 dependencies:
-  nixpkgs:
+  nixpkgs/nixpkgs-unstable:
     - git
     - nix
 steps:
