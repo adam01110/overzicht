@@ -63,7 +63,23 @@ overzicht ipc call overview open
 
 # Close it
 overzicht ipc call overview close
+
+# Open it, or cycle forward when already open
+overzicht ipc call overview cycle
+
+# Open it, or cycle backward when already open
+overzicht ipc call overview cycleBackwards
 ```
+
+For switcher-style behavior, bind `Super`+`Tab` to `cycle` instead of `toggle`:
+
+```ini
+bind = Super, Tab, exec, overzicht ipc call overview cycle
+bind = Super Shift, Tab, exec, overzicht ipc call overview cycleBackwards
+```
+
+The first press opens the overview, repeated presses cycle the selection,
+`Shift`+`Tab` cycles backward, and releasing `Super` closes it.
 
 When running from the flake directly, pass IPC arguments after `--`:
 
@@ -76,6 +92,7 @@ Keyboard controls while the overview is open:
 | Key | Action |
 | --- | --- |
 | `Left` / `Right` / `Up` / `Down` | Move across the grid |
+| Repeated `Super`+`Tab` / `Super`+`Shift`+`Tab` | Cycle forward/backward; release `Super` to close |
 | `h` / `j` / `k` / `l` | Vim-style grid movement |
 | `1` to `9` | Jump to that workspace position |
 | `0` | Jump to position 10 when available |

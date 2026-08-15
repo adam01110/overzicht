@@ -11,6 +11,39 @@ import "."
 
 Scope {
     id: overviewScope
+
+    function cycleOrOpen(step): void {
+        if (!GlobalStates.overviewOpen) {
+            GlobalStates.overviewOpen = true;
+            return;
+        }
+
+        const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
+        const columns = Config.options.overview.columns;
+        const rows = Config.options.overview.rows;
+        const currentId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
+        const useWorkspaceMap = Config.options.overview.useWorkspaceMap;
+        const workspaceMap = Config.options.overview.workspaceMap ?? [];
+        const focusedMonitorId = Hyprland.focusedMonitor?.id ?? 0;
+        const workspaceOffset = useWorkspaceMap ? Number(workspaceMap[focusedMonitorId] ?? 0) : 0;
+        const currentGroup = Math.floor((currentId - workspaceOffset - 1) / workspacesPerGroup);
+        const minWorkspaceId = currentGroup * workspacesPerGroup + 1 + workspaceOffset;
+        const clampedIndex = Math.max(0, Math.min(workspacesPerGroup - 1, currentId - minWorkspaceId));
+        const normalRow = Math.floor(clampedIndex / columns);
+        const normalColumn = clampedIndex % columns;
+        const visualRow = Config.options.overview.orderBottomUp ? rows - normalRow - 1 : normalRow;
+        const visualColumn = Config.options.overview.orderRightLeft ? columns - normalColumn - 1 : normalColumn;
+        const visualIndex = visualRow * columns + visualColumn;
+        const targetVisualIndex = (visualIndex + step + workspacesPerGroup) % workspacesPerGroup;
+        const targetVisualRow = Math.floor(targetVisualIndex / columns);
+        const targetVisualColumn = targetVisualIndex % columns;
+        const targetNormalRow = Config.options.overview.orderBottomUp ? rows - targetVisualRow - 1 : targetVisualRow;
+        const targetNormalColumn = Config.options.overview.orderRightLeft ? columns - targetVisualColumn - 1 : targetVisualColumn;
+        const targetId = minWorkspaceId + targetNormalRow * columns + targetNormalColumn;
+
+        Hyprland.dispatch(`hl.dsp.focus({workspace = '${targetId}'})`);
+    }
+
     Variants {
         id: overviewVariants
         model: Quickshell.screens
@@ -109,6 +142,13 @@ Scope {
                     }
                 }
 
+                Keys.onReleased: event => {
+                    if (event.key === Qt.Key_Meta || event.key === Qt.Key_Super_L || event.key === Qt.Key_Super_R) {
+                        GlobalStates.overviewOpen = false;
+                        event.accepted = true;
+                    }
+                }
+
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Escape || event.key === Qt.Key_Return) {
                         GlobalStates.overviewOpen = false;
@@ -154,12 +194,14 @@ Scope {
                     let targetVisualRow = toVisualRow(currentNormalRow);
                     let targetVisualColumn = toVisualColumn(currentNormalColumn);
                     let targetId = null;
+                    const superTab = event.key === Qt.Key_Tab && (event.modifiers & Qt.MetaModifier) && !(event.modifiers & Qt.ShiftModifier);
+                    const superBacktab = (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) && (event.modifiers & Qt.MetaModifier);
 
-                    if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
+                    if (event.key === Qt.Key_Left || event.key === Qt.Key_H || superBacktab) {
                         const targetVisualIndex = (targetVisualRow * columns + targetVisualColumn - 1 + workspacesPerGroup) % workspacesPerGroup;
                         targetVisualRow = Math.floor(targetVisualIndex / columns);
                         targetVisualColumn = targetVisualIndex % columns;
-                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
+                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L || superTab) {
                         const targetVisualIndex = (targetVisualRow * columns + targetVisualColumn + 1) % workspacesPerGroup;
                         targetVisualRow = Math.floor(targetVisualIndex / columns);
                         targetVisualColumn = targetVisualIndex % columns;
@@ -176,7 +218,7 @@ Scope {
                             targetId = minWorkspaceId + 9;
                     }
 
-                    if (targetId === null && (event.key === Qt.Key_Left || event.key === Qt.Key_H || event.key === Qt.Key_Right || event.key === Qt.Key_L || event.key === Qt.Key_Up || event.key === Qt.Key_K || event.key === Qt.Key_Down || event.key === Qt.Key_J)) {
+                    if (targetId === null && (event.key === Qt.Key_Left || event.key === Qt.Key_H || event.key === Qt.Key_Right || event.key === Qt.Key_L || event.key === Qt.Key_Up || event.key === Qt.Key_K || event.key === Qt.Key_Down || event.key === Qt.Key_J || superTab || superBacktab)) {
                         const targetNormalRow = toNormalRow(targetVisualRow);
                         const targetNormalColumn = toNormalColumn(targetVisualColumn);
                         targetId = minWorkspaceId + targetNormalRow * columns + targetNormalColumn;
@@ -216,6 +258,12 @@ Scope {
         }
         function close(): void {
             GlobalStates.overviewOpen = false;
+        }
+        function cycle(): void {
+            overviewScope.cycleOrOpen(1);
+        }
+        function cycleBackwards(): void {
+            overviewScope.cycleOrOpen(-1);
         }
         function open(): void {
             GlobalStates.overviewOpen = true;
