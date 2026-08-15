@@ -142,13 +142,6 @@ Scope {
                     }
                 }
 
-                Keys.onReleased: event => {
-                    if (event.key === Qt.Key_Meta || event.key === Qt.Key_Super_L || event.key === Qt.Key_Super_R) {
-                        GlobalStates.overviewOpen = false;
-                        event.accepted = true;
-                    }
-                }
-
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Escape || event.key === Qt.Key_Return) {
                         GlobalStates.overviewOpen = false;
@@ -194,14 +187,14 @@ Scope {
                     let targetVisualRow = toVisualRow(currentNormalRow);
                     let targetVisualColumn = toVisualColumn(currentNormalColumn);
                     let targetId = null;
-                    const superTab = event.key === Qt.Key_Tab && (event.modifiers & Qt.MetaModifier) && !(event.modifiers & Qt.ShiftModifier);
-                    const superBacktab = (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) && (event.modifiers & Qt.MetaModifier);
+                    const tabForward = event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier);
+                    const tabBackward = event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier));
 
-                    if (event.key === Qt.Key_Left || event.key === Qt.Key_H || superBacktab) {
+                    if (event.key === Qt.Key_Left || event.key === Qt.Key_H || tabBackward) {
                         const targetVisualIndex = (targetVisualRow * columns + targetVisualColumn - 1 + workspacesPerGroup) % workspacesPerGroup;
                         targetVisualRow = Math.floor(targetVisualIndex / columns);
                         targetVisualColumn = targetVisualIndex % columns;
-                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L || superTab) {
+                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L || tabForward) {
                         const targetVisualIndex = (targetVisualRow * columns + targetVisualColumn + 1) % workspacesPerGroup;
                         targetVisualRow = Math.floor(targetVisualIndex / columns);
                         targetVisualColumn = targetVisualIndex % columns;
@@ -218,7 +211,7 @@ Scope {
                             targetId = minWorkspaceId + 9;
                     }
 
-                    if (targetId === null && (event.key === Qt.Key_Left || event.key === Qt.Key_H || event.key === Qt.Key_Right || event.key === Qt.Key_L || event.key === Qt.Key_Up || event.key === Qt.Key_K || event.key === Qt.Key_Down || event.key === Qt.Key_J || superTab || superBacktab)) {
+                    if (targetId === null && (event.key === Qt.Key_Left || event.key === Qt.Key_H || event.key === Qt.Key_Right || event.key === Qt.Key_L || event.key === Qt.Key_Up || event.key === Qt.Key_K || event.key === Qt.Key_Down || event.key === Qt.Key_J || tabForward || tabBackward)) {
                         const targetNormalRow = toNormalRow(targetVisualRow);
                         const targetNormalColumn = toNormalColumn(targetVisualColumn);
                         targetId = minWorkspaceId + targetNormalRow * columns + targetNormalColumn;
