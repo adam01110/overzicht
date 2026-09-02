@@ -546,7 +546,7 @@ Item {
                 return;
 
             const targetTop = targetWindow.mapToItem(root, targetWindow.width / 2, 0);
-            tooltipX = Math.max(edgeMargin, Math.min(root.width - width - edgeMargin, targetTop.x - width / 2));
+            tooltipX = targetTop.x - width / 2;
             tooltipY = targetTop.y - height - edgeMargin;
         }
 
