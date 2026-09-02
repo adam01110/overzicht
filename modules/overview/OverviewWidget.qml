@@ -541,17 +541,26 @@ Item {
         fadeAnimationEnabled: root.tooltipFadeAnimationEnabled
         fadeAnimationDuration: root.tooltipFadeAnimationDuration
 
+        function updatePosition() {
+            if (!targetWindow)
+                return;
+
+            const targetTop = targetWindow.mapToItem(root, targetWindow.width / 2, 0);
+            tooltipX = Math.max(edgeMargin, Math.min(root.width - width - edgeMargin, targetTop.x - width / 2));
+            tooltipY = targetTop.y - height - edgeMargin;
+        }
+
         onTargetWindowChanged: {
             if (targetWindow) {
-                const targetTop = targetWindow.mapToItem(root, targetWindow.width / 2, 0);
-                tooltipX = Math.max(edgeMargin, Math.min(root.width - width - edgeMargin, targetTop.x - width / 2));
-                tooltipY = targetTop.y - height - edgeMargin;
+                updatePosition();
                 if (!hasPosition)
                     Qt.callLater(() => sharedWindowTooltip.hasPosition = true);
             } else {
                 hasPosition = false;
             }
         }
+        onWidthChanged: updatePosition()
+        onHeightChanged: updatePosition()
 
         Behavior on x {
             enabled: sharedWindowTooltip.hasPosition
