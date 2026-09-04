@@ -27,6 +27,8 @@ Item { // Window
     property var targetWindowHeight: (windowData?.size[1] ?? 100) * scale
     property bool hovered: false
     property bool pressed: false
+    property bool keyboardSelected: false
+    property bool keyboardMoving: false
 
     property var iconToWindowRatio: Config.options.windowPreview.iconToWindowRatio
     property var xwaylandIndicatorToIconRatio: Config.options.windowPreview.xwaylandIndicatorToIconRatio
@@ -136,9 +138,9 @@ Item { // Window
     Rectangle {
         anchors.fill: parent
         radius: root.windowRounding
-        color: pressed ? ColorUtils.applyAlpha(Appearance.colors.windowActive, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered ? ColorUtils.applyAlpha(Appearance.colors.windowHover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.transparentize(Appearance.colors.window)
-        border.color: Appearance.colors.windowBorder
-        border.width: 1
+        color: pressed ? ColorUtils.applyAlpha(Appearance.colors.windowActive, Math.min(1, root.windowOverlayOpacity + 0.30)) : hovered || root.keyboardSelected ? ColorUtils.applyAlpha(Appearance.colors.windowHover, Math.min(1, root.windowOverlayOpacity + 0.20)) : ColorUtils.transparentize(Appearance.colors.window)
+        border.color: root.keyboardSelected ? (root.keyboardMoving ? Appearance.colors.windowActive : Appearance.colors.accent) : Appearance.colors.windowBorder
+        border.width: root.keyboardSelected ? Appearance.sizes.elevationMargin / 2 : 1
 
         ColumnLayout {
             anchors.verticalCenter: parent.verticalCenter

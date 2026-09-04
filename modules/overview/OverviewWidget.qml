@@ -50,7 +50,30 @@ Item {
     property bool tooltipExpandCollapseAnimationEnabled: Config.options.windowPreview.tooltipAnimations.expandCollapse.enable
     property bool tooltipFadeAnimationEnabled: Config.options.windowPreview.tooltipAnimations.fade.enable
     property int tooltipFadeAnimationDuration: Math.max(0, Config.options.windowPreview.tooltipAnimations.fade.duration)
+    readonly property int workspaceNavigationMode: 0
+    readonly property int windowSelectionMode: 1
+    readonly property int windowMovementMode: 2
+    readonly property var shiftedNumberKeys: [Qt.Key_Exclam, Qt.Key_At, Qt.Key_NumberSign, Qt.Key_Dollar, Qt.Key_Percent, Qt.Key_AsciiCircum, Qt.Key_Ampersand, Qt.Key_Asterisk, Qt.Key_ParenLeft, Qt.Key_ParenRight]
+    property int keyboardMode: workspaceNavigationMode
+    property string selectedWindowAddress: ""
+    property int selectedWindowWorkspaceId: -1
     readonly property bool hasEmptyWorkspaceWallpaper: `${emptyWorkspaceWallpaperPath ?? ""}`.trim().length > 0
+    onEffectiveActiveWorkspaceIdChanged: {
+        if (root.keyboardMode !== root.workspaceNavigationMode)
+            root.resetWindowKeyboardNavigation();
+    }
+    onWindowByAddressChanged: {
+        if (root.keyboardMode === root.workspaceNavigationMode)
+            return;
+
+        const selectedData = root.windowByAddress[root.selectedWindowAddress];
+        if (!selectedData) {
+            root.resetWindowKeyboardNavigation();
+            return;
+        }
+
+        root.selectedWindowWorkspaceId = selectedData.workspace?.id ?? root.selectedWindowWorkspaceId;
+    }
     onSmoothTooltipMovementChanged: {
         tooltipHideTimer.stop();
         sharedWindowTooltip.targetWindow = null;
@@ -73,6 +96,290 @@ Item {
     function hideWindowTooltip(window) {
         if (root.smoothTooltipMovement && sharedWindowTooltip.targetWindow === window)
             tooltipHideTimer.restart();
+    }
+
+    function resetWindowKeyboardNavigation() {
+        root.keyboardMode = root.workspaceNavigationMode;
+        root.selectedWindowAddress = "";
+        root.selectedWindowWorkspaceId = -1;
+        tooltipHideTimer.stop();
+        sharedWindowTooltip.targetWindow = null;
+    }
+
+    function selectableWindows(workspaceId) {
+        const candidates = [];
+        for (let i = 0; i < windowRepeater.count; ++i) {
+            const candidate = windowRepeater.itemAt(i);
+            const data = candidate?.windowData;
+            if (!candidate?.visible || !data?.address || data.workspace?.id !== workspaceId)
+                continue;
+            if (data.floating || (data.fullscreen ?? 0) > 0)
+                continue;
+            candidates.push(candidate);
+        }
+        return candidates;
+    }
+
+    function selectedWindow() {
+        for (let i = 0; i < windowRepeater.count; ++i) {
+            const candidate = windowRepeater.itemAt(i);
+            if (candidate?.windowData?.address === root.selectedWindowAddress)
+                return candidate;
+        }
+        return null;
+    }
+
+    function selectWindow(window) {
+        if (!window?.windowData?.address)
+            return false;
+
+        root.selectedWindowAddress = window.windowData.address;
+        root.selectedWindowWorkspaceId = window.windowData.workspace?.id ?? -1;
+        root.showWindowTooltip(window);
+        return true;
+    }
+
+    function selectInitialWindow() {
+        const candidates = root.selectableWindows(root.effectiveActiveWorkspaceId);
+        if (candidates.length === 0) {
+            root.resetWindowKeyboardNavigation();
+            return null;
+        }
+
+        let selected = candidates[0];
+        for (const candidate of candidates) {
+            if ((candidate.windowData?.focusHistoryID ?? 2147483647) < (selected.windowData?.focusHistoryID ?? 2147483647))
+                selected = candidate;
+        }
+        root.selectWindow(selected);
+        return selected;
+    }
+
+    function windowCenter(window) {
+        return Qt.point(window.x + window.width / 2, window.y + window.height / 2);
+    }
+
+    function directionalWindow(current, directionX, directionY, wrap) {
+        if (!current)
+            return null;
+
+        const currentCenter = root.windowCenter(current);
+        const candidates = root.selectableWindows(current.windowData?.workspace?.id);
+        let best = null;
+        let bestScore = Number.MAX_VALUE;
+        for (const candidate of candidates) {
+            if (candidate === current)
+                continue;
+            const center = root.windowCenter(candidate);
+            const deltaX = center.x - currentCenter.x;
+            const deltaY = center.y - currentCenter.y;
+            const forwardDistance = deltaX * directionX + deltaY * directionY;
+            if (forwardDistance <= 1)
+                continue;
+            const crossDistance = Math.abs(deltaX * directionY - deltaY * directionX);
+            const score = forwardDistance + crossDistance * 2;
+            if (score < bestScore) {
+                best = candidate;
+                bestScore = score;
+            }
+        }
+
+        if (best || !wrap)
+            return best;
+
+        // Wrap selection to the opposite visual edge when no window is ahead.
+        for (const candidate of candidates) {
+            if (candidate === current)
+                continue;
+            const center = root.windowCenter(candidate);
+            const edgeDistance = directionX > 0 ? center.x : directionX < 0 ? -center.x : directionY > 0 ? center.y : -center.y;
+            const alignmentDistance = directionX !== 0 ? Math.abs(center.y - currentCenter.y) : Math.abs(center.x - currentCenter.x);
+            const score = edgeDistance * 1000 + alignmentDistance;
+            if (score < bestScore) {
+                best = candidate;
+                bestScore = score;
+            }
+        }
+        return best;
+    }
+
+    function activateWorkspace(workspaceId) {
+        if (!Number.isFinite(workspaceId) || workspaceId < 1)
+            return;
+
+        root.resetWindowKeyboardNavigation();
+        GlobalStates.overviewOpen = false;
+        Hyprland.dispatch(`hl.dsp.focus({workspace = '${workspaceId}'})`);
+    }
+
+    function activateWindow(address) {
+        if (!address)
+            return;
+
+        root.resetWindowKeyboardNavigation();
+        GlobalStates.overviewOpen = false;
+        Hyprland.dispatch(`hl.dsp.focus({window = 'address:${address}'})`);
+    }
+
+    function closeWindow(address) {
+        if (address)
+            Hyprland.dispatch(`hl.dsp.window.close('address:${address}')`);
+    }
+
+    function moveWindowToWorkspace(address, targetWorkspace) {
+        if (!address || !Number.isFinite(targetWorkspace) || targetWorkspace < 1)
+            return false;
+
+        Hyprland.dispatch(`hl.dsp.window.move({workspace = '${targetWorkspace}', follow = false, window = 'address:${address}'})`);
+        return true;
+    }
+
+    function swapWindows(address, targetAddress) {
+        if (!address || !targetAddress)
+            return false;
+
+        Hyprland.dispatch(`hl.dsp.window.swap({target = 'address:${targetAddress}', window = 'address:${address}'})`);
+        return true;
+    }
+
+    function finishWindowMutation(window) {
+        HyprlandData.scheduleUpdates(true, false);
+        root.refreshWindowCaptures();
+        window?.schedulePositionUpdate();
+    }
+
+    function selectWindowInDirection(directionX, directionY) {
+        const selected = root.selectedWindow() ?? root.selectInitialWindow();
+        const target = root.directionalWindow(selected, directionX, directionY, true);
+        if (target)
+            root.selectWindow(target);
+    }
+
+    function swapWindowInDirection(directionX, directionY) {
+        const selected = root.selectedWindow();
+        if (!selected)
+            return;
+        const target = root.directionalWindow(selected, directionX, directionY, false);
+        if (!target || !root.swapWindows(root.selectedWindowAddress, target.windowData?.address))
+            return;
+
+        root.finishWindowMutation(selected);
+    }
+
+    function moveSelectedWindowToWorkspace(targetWorkspace) {
+        if (targetWorkspace === root.selectedWindowWorkspaceId || !root.moveWindowToWorkspace(root.selectedWindowAddress, targetWorkspace))
+            return;
+
+        root.selectedWindowWorkspaceId = targetWorkspace;
+        root.finishWindowMutation(root.selectedWindow());
+    }
+
+    function moveWindowToAdjacentWorkspace(directionX, directionY) {
+        if (!Number.isFinite(root.selectedWindowWorkspaceId) || root.selectedWindowWorkspaceId < 1)
+            return;
+
+        const targetRow = root.getWorkspaceRow(root.selectedWindowWorkspaceId) + directionY;
+        const targetColumn = root.getWorkspaceColumn(root.selectedWindowWorkspaceId) + directionX;
+        if (targetRow < 0 || targetRow >= Config.options.overview.rows || targetColumn < 0 || targetColumn >= Config.options.overview.columns)
+            return;
+
+        root.moveSelectedWindowToWorkspace(root.getWorkspaceInCell(targetRow, targetColumn));
+    }
+
+    function numberKeyPosition(key) {
+        if (key >= Qt.Key_1 && key <= Qt.Key_9)
+            return key - Qt.Key_0;
+        if (key === Qt.Key_0)
+            return 10;
+        return root.shiftedNumberKeys.indexOf(key) + 1;
+    }
+
+    function advanceKeyboardMode() {
+        switch (root.keyboardMode) {
+        case root.workspaceNavigationMode:
+            if (root.selectInitialWindow())
+                root.keyboardMode = root.windowSelectionMode;
+            break;
+        case root.windowSelectionMode:
+            root.keyboardMode = root.windowMovementMode;
+            break;
+        case root.windowMovementMode:
+            root.resetWindowKeyboardNavigation();
+            break;
+        }
+    }
+
+    function retreatKeyboardMode() {
+        if (root.keyboardMode === root.windowMovementMode)
+            root.keyboardMode = root.windowSelectionMode;
+        else
+            root.resetWindowKeyboardNavigation();
+    }
+
+    function directionForKey(key) {
+        switch (key) {
+        case Qt.Key_Left:
+        case Qt.Key_H:
+            return Qt.point(-1, 0);
+        case Qt.Key_Right:
+        case Qt.Key_L:
+            return Qt.point(1, 0);
+        case Qt.Key_Up:
+        case Qt.Key_K:
+            return Qt.point(0, -1);
+        case Qt.Key_Down:
+        case Qt.Key_J:
+            return Qt.point(0, 1);
+        default:
+            return null;
+        }
+    }
+
+    function handleWorkspaceMoveShortcut(event) {
+        if (root.keyboardMode !== root.windowMovementMode || !(event.modifiers & Qt.ShiftModifier))
+            return false;
+
+        const position = root.numberKeyPosition(event.key);
+        if (position < 1 || position > root.workspacesShown)
+            return false;
+
+        const firstWorkspace = root.workspaceGroup * root.workspacesShown + 1 + root.workspaceOffset;
+        root.moveSelectedWindowToWorkspace(firstWorkspace + position - 1);
+        return true;
+    }
+
+    function handleDirectionalKey(event) {
+        const direction = root.directionForKey(event.key);
+        if (!direction)
+            return;
+
+        if (root.keyboardMode === root.windowMovementMode) {
+            if (event.modifiers & Qt.ShiftModifier)
+                root.moveWindowToAdjacentWorkspace(direction.x, direction.y);
+            else
+                root.swapWindowInDirection(direction.x, direction.y);
+        } else {
+            root.selectWindowInDirection(direction.x, direction.y);
+        }
+    }
+
+    function handleKeyPress(event) {
+        switch (event.key) {
+        case Qt.Key_Return:
+            root.advanceKeyboardMode();
+            return true;
+        case Qt.Key_Escape:
+            if (root.keyboardMode === root.workspaceNavigationMode)
+                return false;
+            root.retreatKeyboardMode();
+            return true;
+        }
+
+        if (root.keyboardMode === root.workspaceNavigationMode)
+            return false;
+        if (!root.handleWorkspaceMoveShortcut(event))
+            root.handleDirectionalKey(event);
+        return true;
     }
 
     function getWorkspaceRow(workspaceId) {
@@ -294,10 +601,8 @@ Item {
                                 anchors.fill: parent
                                 acceptedButtons: Qt.LeftButton
                                 onClicked: {
-                                    if (root.draggingTargetWorkspace === -1) {
-                                        GlobalStates.overviewOpen = false;
-                                        Hyprland.dispatch(`hl.dsp.focus({workspace = '${workspaceValue}'})`);
-                                    }
+                                    if (root.draggingTargetWorkspace === -1)
+                                        root.activateWorkspace(workspaceValue);
                                 }
                             }
 
@@ -380,8 +685,14 @@ Item {
                     availableWorkspaceWidth: root.workspaceImplicitWidth
                     availableWorkspaceHeight: root.workspaceImplicitHeight
                     widgetMonitorId: root.monitor.id
+                    keyboardSelected: root.keyboardMode !== root.workspaceNavigationMode && root.selectedWindowAddress === windowData?.address
+                    keyboardMoving: root.keyboardMode === root.windowMovementMode
 
                     property bool atInitPosition: initX == x && initY == y
+
+                    function schedulePositionUpdate() {
+                        updateWindowPosition.restart();
+                    }
 
                     property int workspaceColIndex: root.getWorkspaceColumn(windowData?.workspace.id)
                     property int workspaceRowIndex: root.getWorkspaceRow(windowData?.workspace.id)
@@ -418,6 +729,7 @@ Item {
                         acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                         drag.target: parent
                         onPressed: mouse => {
+                            root.resetWindowKeyboardNavigation();
                             root.draggingFromWorkspace = windowData?.workspace.id;
                             window.pressed = true;
                             window.Drag.active = true;
@@ -444,18 +756,14 @@ Item {
                             root.draggingTargetWorkspace = -1;
                             if (targetWorkspace !== -1) {
                                 const changingWorkspace = targetWorkspace !== windowData?.workspace.id;
-                                if (changingWorkspace)
-                                    Hyprland.dispatch(`hl.dsp.window.move({workspace = '${targetWorkspace}', follow = false, window = 'address:${address}'})`);
-                                if (swapTarget) {
-                                    Hyprland.dispatch(`hl.dsp.window.swap({target = 'address:${swapTarget}', window = 'address:${address}'})`);
+                                const moved = changingWorkspace && root.moveWindowToWorkspace(address, targetWorkspace);
+                                const swapped = root.swapWindows(address, swapTarget);
+                                if (swapped)
                                     Hyprland.dispatch(`hl.dsp.cursor.move({x = ${Math.round(cursorPosition.x)}, y = ${Math.round(cursorPosition.y)}})`);
-                                }
 
-                                if (changingWorkspace || swapTarget) {
-                                    HyprlandData.updateWindowList();
-                                    root.refreshWindowCaptures();
-                                    updateWindowPosition.restart();
-                                } else {
+                                if (moved || swapped)
+                                    root.finishWindowMutation(window);
+                                else {
                                     window.x = window.initX;
                                     window.y = window.initY;
                                 }
@@ -469,18 +777,17 @@ Item {
                                 return;
 
                             if (event.button === Qt.LeftButton) {
-                                GlobalStates.overviewOpen = false;
-                                Hyprland.dispatch(`hl.dsp.focus({window = 'address:${windowData.address}'})`);
+                                root.activateWindow(windowData.address);
                                 event.accepted = true;
                             } else if (event.button === Qt.MiddleButton) {
-                                Hyprland.dispatch(`hl.dsp.window.close('address:${windowData.address}')`);
+                                root.closeWindow(windowData.address);
                                 event.accepted = true;
                             }
                         }
 
                         StyledToolTip {
                             extraVisibleCondition: false
-                            alternativeVisibleCondition: !root.smoothTooltipMovement && dragArea.containsMouse && !window.Drag.active
+                            alternativeVisibleCondition: !root.smoothTooltipMovement && (dragArea.containsMouse || window.keyboardSelected) && !window.Drag.active
                             text: root.windowTooltipText(window)
                             expandCollapseAnimationEnabled: root.tooltipExpandCollapseAnimationEnabled
                             fadeAnimationEnabled: root.tooltipFadeAnimationEnabled

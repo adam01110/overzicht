@@ -91,13 +91,20 @@ Keyboard controls while the overview is open:
 
 | Key | Action |
 | --- | --- |
-| `Left` / `Right` / `Up` / `Down` | Move across the grid |
-| `Tab` / `Shift`+`Tab` | Cycle forward/backward |
-| `h` / `j` / `k` / `l` | Vim-style grid movement |
+| `Left` / `Right` / `Up` / `Down` | Move across the workspace grid |
+| `Tab` / `Shift`+`Tab` | Cycle workspaces forward/backward |
+| `h` / `j` / `k` / `l` | Vim-style workspace movement |
+| `Return` | Enter window selection mode on the active workspace |
+| Direction keys in selection mode | Select a tiled window |
+| `Return` in selection mode | Pick up the selected window |
+| Direction keys while moving | Swap with the nearest tiled window |
+| `Shift`+direction while moving | Send the window to the adjacent workspace |
+| `Shift`+`1` to `9` while moving | Send the window to that workspace position |
+| `Shift`+`0` while moving | Send the window to position 10 when available |
+| `Return` while moving | Drop the window and return to workspace navigation |
+| `Escape` | Step back one mode, or close the overview |
 | `1` to `9` | Jump to that workspace position |
 | `0` | Jump to position 10 when available |
-| `Return` | Close the overview |
-| `Escape` | Close the overview |
 
 Mouse controls:
 
