@@ -104,7 +104,9 @@ Path: `~/.config/overzicht/settings.json`
     // Inner padding between the overview panel border and the workspace grid.
     "backgroundPadding": 10,
     // Base font size for workspace numbers before monitor scale and overview scale are applied.
-    "workspaceNumberBaseSize": 250
+    "workspaceNumberBaseSize": 250,
+    // Renders workspace index labels as roman numerals instead of arabic numerals.
+    "romanNumerals": false
   },
   "windowPreview": {
     // Show application icons centered over window previews.

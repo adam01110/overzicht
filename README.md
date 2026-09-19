@@ -178,6 +178,7 @@ Useful settings:
 - `overview.hideEmptyRows` keeps the grid compact when a row has no windows.
 - `overview.closeOnFocusLoss` closes the overlay after outside clicks or focus loss.
 - `overview.workspaceMap` lets different monitors start at different workspace offsets.
+- `overview.romanNumerals` renders the workspace index labels as roman numerals.
 - `overview.previewMode` can be `live` or event-driven values like `event` / `snapshot`.
 - `appearance.rounding.screenRounding` and `appearance.rounding.windowRounding` control overview corner radius. Set them to `0` for a square UI.
 - `windowPreview.showIcons` controls centered app icons on previews.

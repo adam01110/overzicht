@@ -115,6 +115,7 @@ Singleton {
             property real workspaceSpacing: root.optionValue(["overview", "workspaceSpacing"], 5)
             property real backgroundPadding: root.optionValue(["overview", "backgroundPadding"], 10)
             property real workspaceNumberBaseSize: root.optionValue(["overview", "workspaceNumberBaseSize"], 250)
+            property bool romanNumerals: root.optionValue(["overview", "romanNumerals"], false)
             property QtObject effects: QtObject {
                 property bool enableBackdrop: root.optionValue(["overview", "effects", "enableBackdrop"], false)
                 property real backdropOpacity: root.optionValue(["overview", "effects", "backdropOpacity"], 0.28)

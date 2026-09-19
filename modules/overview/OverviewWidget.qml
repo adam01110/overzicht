@@ -46,6 +46,7 @@ Item {
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
     property bool hideEmptyRows: Config.options.overview.hideEmptyRows
+    readonly property bool romanNumerals: Config.options.overview.romanNumerals
     property bool smoothTooltipMovement: Config.options.windowPreview.smoothTooltipMovement
     property bool tooltipExpandCollapseAnimationEnabled: Config.options.windowPreview.tooltipAnimations.expandCollapse.enable
     property bool tooltipFadeAnimationEnabled: Config.options.windowPreview.tooltipAnimations.fade.enable
@@ -77,6 +78,26 @@ Item {
     onSmoothTooltipMovementChanged: {
         tooltipHideTimer.stop();
         sharedWindowTooltip.targetWindow = null;
+    }
+
+    function romanNumeral(value) {
+        const symbols = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],];
+        let remaining = Math.floor(value);
+        let numeral = "";
+        for (const [amount, symbol] of symbols) {
+            while (remaining >= amount) {
+                numeral += symbol;
+                remaining -= amount;
+            }
+        }
+        return numeral;
+    }
+
+    function workspaceNumberLabel(value) {
+        if (!root.romanNumerals || !Number.isFinite(value) || value < 1)
+            return `${value}`;
+
+        return root.romanNumeral(value);
     }
 
     function windowTooltipText(window) {
@@ -585,7 +606,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 visible: !workspace.showWallpaper
-                                text: workspaceValue
+                                text: root.workspaceNumberLabel(workspaceValue)
                                 font {
                                     pixelSize: root.workspaceNumberSize * root.scale
                                     weight: Font.DemiBold
