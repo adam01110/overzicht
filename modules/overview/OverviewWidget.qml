@@ -244,7 +244,7 @@ Item {
 
     function closeWindow(address) {
         if (address)
-            Hyprland.dispatch(`hl.dsp.window.close('address:${address}')`);
+            Hyprland.dispatch(`hl.dsp.window.close({ window = 'address:${address}' })`);
     }
 
     function moveWindowToWorkspace(address, targetWorkspace) {
